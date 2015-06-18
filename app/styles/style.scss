@@ -1,0 +1,105 @@
+//colors
+$color_azure_radiance_approx: #09f;
+$black_30: rgba(0, 0, 0, 0.3);
+$white: #fff;
+$color_cornflower_blue_approx: #4d90fe;
+
+//fonts
+$font_0: 'Roboto';
+
+html {
+	height: 100%;
+}
+body {
+	font-family: $font_0;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+h2 {
+	text-align: center;
+}
+ul {
+	padding: 0;
+	margin: 0;
+}
+li {
+	cursor: hand;
+	padding-left: 0;
+	margin: 0;
+	p {
+		text-align: center;
+		padding: 5px;
+		margin: 0;
+	}
+	&:hover {
+		background-color: $color_azure_radiance_approx;
+	}
+}
+hr {
+	margin: 0;
+	padding: 0;
+}
+#map-canvas {
+	height: 100%;
+}
+.controls {
+	margin-top: 16px;
+	border: 1px solid transparent;
+	//Instead of the line below you could use @includeborder-radius($radius, $vertical-radius)
+	border-radius: 2px 0 0 2px;
+	//Instead of the line below you could use @includebox-sizing($bs)
+	box-sizing: border-box;
+	height: 32px;
+	outline: none;
+	//Instead of the line below you could use @includebox-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+	box-shadow: 0 2px 6px $black_30;
+}
+#list {
+	background-color: $white;
+	font-size: 11px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 0;
+	overflow: auto;
+	width: 25%;
+	height: 65%;
+}
+@media screen and(max-width: 400px) {
+	#pac-input {
+		width: 90%;
+		&:focus {
+			width: 91%;
+		}
+	}
+}
+#pac-input {
+	background-color: $white;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 0 11px 0 13px;
+	text-overflow: ellipsis;
+	width: 300px;
+	&:focus {
+		border-color: $color_cornflower_blue_approx;
+		margin-left: -1px;
+		padding-left: 14px;
+		width: 301px;
+	}
+}
+.pac-container {
+}
+#type-selector {
+	color: $white;
+	background-color: $color_cornflower_blue_approx;
+	padding: 5px 11px 0;
+	label {
+		font-size: 13px;
+		font-weight: 300;
+	}
+}
+p.name {
+	font-size: 14px;
+	font-weight: bold;
+}
