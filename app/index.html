@@ -20,19 +20,19 @@
 
 				<div class="row">
 						<!-- map here -->
-						<div class="col-xs-12 col-sm-8 map">
+						<div class="col-xs-12 map">
 						<div id="map-canvas"></div>
-					</div>
-						<!-- list here -->
-						<div class="col-sm-4">
-							<h2>list here</h2>
-								<ul class="list-unstyled">
-										<li>Knockout</li>
-										<li>Bootstrap</li>
-										<li>jQuery v1.11.1</li>
-								</ul>
 
+						<!-- list here -->
+						<div class="myhood-list">
+							<div class="search-myhood">
+								<form class="input-group" data-bind="submit: updateResults">
+						      <input type="text" placeholder="Can I help you?" class="form-control" data-bind="value: searchTerm">
+						    </form>
+							</div>
+							<ul class="results"><li>knockout</li></ul>
 						</div>
+					</div>
 				</div>
 				<!-- /.row -->
 
