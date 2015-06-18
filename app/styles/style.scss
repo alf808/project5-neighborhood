@@ -3,6 +3,7 @@ $color_azure_radiance_approx: #09f;
 $black_30: rgba(0, 0, 0, 0.3);
 $white: #fff;
 $color_cornflower_blue_approx: #4d90fe;
+$myhood-red: red;
 
 //fonts
 $font_0: 'Roboto';
@@ -41,9 +42,65 @@ hr {
 	padding: 0;
 }
 #map-canvas {
+	position:fixed;
 	height: 100%;
+	width: 100%;
 //	height:calc(100% - 0px);
 }
+
+.myhood-list ul,
+.search-myhood {
+	position:fixed;
+	top:0;
+	right:0;
+	width:400px;
+	background-color:rgba(white, 0.85);
+}
+
+.myhood-list ul {
+	margin-right:-100%;
+	padding:60px 0 20px;
+	height:100%;
+	overflow-y:auto;
+	z-index:9;
+//	@include transition-property(all);
+//	@include transition-duration(0.5s);
+	&.show {
+		margin-right:0;
+	}
+	h3 {
+		font-size:24px;
+		font-weight:400;
+		line-height:1.42em;
+		margin-top:0;
+		color:$myhood-red;
+		span {
+			border-bottom:1px solid $myhood-red;
+		}
+	}
+	p {
+		span {
+			display:block;
+		}
+	}
+	li {
+		list-style:none;
+		margin:0;
+		padding:30px 20px 20px;
+		border-top:1px dashed #ccc;
+		cursor:pointer;
+		&:first-child {
+			border-top:0;
+		}
+		&:hover {
+			background-color:lightyellow;
+		}
+		&.active {
+			background-color:#efefef;
+		}
+	}
+}
+
 .controls {
 	margin-top: 16px;
 	border: 1px solid transparent;
@@ -65,6 +122,31 @@ hr {
 	overflow: auto;
 	width: 25%;
 	height: 65%;
+}
+@media screen and(max-width: 400px) {
+	#pac-input {
+		width: 90%;
+		&:focus {
+			width: 91%;
+		}
+	}
+}
+#pac-input {
+	background-color: $white;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 0 11px 0 13px;
+	text-overflow: ellipsis;
+	width: 300px;
+	&:focus {
+		border-color: $color_cornflower_blue_approx;
+		margin-left: -1px;
+		padding-left: 14px;
+		width: 301px;
+	}
+}
+.pac-container {
 }
 #type-selector {
 	color: $white;
