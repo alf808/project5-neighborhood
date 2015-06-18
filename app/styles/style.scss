@@ -7,7 +7,7 @@ $color_cornflower_blue_approx: #4d90fe;
 //fonts
 $font_0: 'Roboto';
 
-html {
+html, .container, .row, .map {
 	height: 100%;
 }
 body {
@@ -42,6 +42,7 @@ hr {
 }
 #map-canvas {
 	height: 100%;
+//	height:calc(100% - 0px);
 }
 .controls {
 	margin-top: 16px;
@@ -64,31 +65,6 @@ hr {
 	overflow: auto;
 	width: 25%;
 	height: 65%;
-}
-@media screen and(max-width: 400px) {
-	#pac-input {
-		width: 90%;
-		&:focus {
-			width: 91%;
-		}
-	}
-}
-#pac-input {
-	background-color: $white;
-	font-size: 15px;
-	font-weight: 300;
-	margin-left: 12px;
-	padding: 0 11px 0 13px;
-	text-overflow: ellipsis;
-	width: 300px;
-	&:focus {
-		border-color: $color_cornflower_blue_approx;
-		margin-left: -1px;
-		padding-left: 14px;
-		width: 301px;
-	}
-}
-.pac-container {
 }
 #type-selector {
 	color: $white;

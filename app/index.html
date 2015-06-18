@@ -7,26 +7,41 @@
 		<meta name="description" content="interesting places near Kapahulu, Diamond Head, and Waikiki Oahu Hawaii">
 		<meta name="author" content="Alf Maglalang">
 		<title>What is in my neighborhood</title>
-		<!-- link href="libs/bootstrap.min.css" rel="stylesheet" -->
+		<link href="libs/normalize.css" rel="stylesheet">
+		<!-- link href="libs/skeleton.css" rel="stylesheet" -->
+		<link href="libs/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="libs/bootstrap.min.css" rel="stylesheet">
 		<link href="styles/style.css" rel="stylesheet">
 		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
 	</head>
 	<body>
 		<!-- Page Content -->
-		<!-- div class="container" -->
+		<div class="container">
 
-				<!-- div class="row" -->
+				<div class="row">
 						<!-- map here -->
+						<div class="col-xs-12 col-sm-8 map">
 						<div id="map-canvas"></div>
+					</div>
 						<!-- list here -->
-				<!-- /div -->
+						<div class="col-sm-4">
+							<h2>list here</h2>
+								<ul class="list-unstyled">
+										<li>Knockout</li>
+										<li>Bootstrap</li>
+										<li>jQuery v1.11.1</li>
+								</ul>
+
+						</div>
+				</div>
 				<!-- /.row -->
 
-		<!-- /div -->
+		</div>
 		<!-- /.container -->
 
 		<script src="libs/knockout.js"></script>
 		<script src="libs/jquery.min.js"></script>
+		<script src="libs/bootstrap.min.js"></script>
 		<!-- build:js scripts/main.min.js -->
 		<script src="scripts/model.js"></script>
 		<script src="scripts/vmapp.js"></script>
