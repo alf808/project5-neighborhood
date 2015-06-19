@@ -1,11 +1,11 @@
-function appOctopus() {
+function neighborhoodMapViewModel() {
 	var self = this;
 	var map;
 	var service;
 	var infowindow;
-	var lat = '21.2790587';
-	var lng = '-157.81368810000004';
-	var kapahulu = new google.maps.LatLng(21.2790587, -157.81368810000004);
+	var lat = 21.2790587;
+	var lng = -157.81368810000004;
+	var kapahulu = new google.maps.LatLng(lat, lng);
 	// waikiki zoo to begin of st louis heights/waialae
 	// var defaultBounds = new google.maps.LatLngBounds(
 	//	 new google.maps.LatLng(21.271141, -157.821438),
@@ -34,25 +34,13 @@ function appOctopus() {
 
 		// Set CSS for the control border
 		var controlUI = document.createElement('div');
-		controlUI.style.backgroundColor = 'yellow';
-		controlUI.style.border = '2px solid #fff';
-		controlUI.style.borderRadius = '3px';
-		controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-		controlUI.style.cursor = 'pointer';
-		controlUI.style.marginBottom = '22px';
-		controlUI.style.marginLeft = '5px';
-		controlUI.style.textAlign = 'center';
+		controlUI.className = "reset-button";
 		controlUI.title = 'Click to recenter the map';
 		controlDiv.appendChild(controlUI);
 
 		// Set CSS for the control interior
 		var controlText = document.createElement('div');
-		controlText.style.color = 'rgb(25,25,25)';
-		controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-		controlText.style.fontSize = '16px';
-		controlText.style.lineHeight = '38px';
-		controlText.style.paddingLeft = '5px';
-		controlText.style.paddingRight = '5px';
+		controlText.className = "reset-button-text";
 		controlText.innerHTML = 'Center Map';
 		controlUI.appendChild(controlText);
 
@@ -62,7 +50,6 @@ function appOctopus() {
 		});
 
 	}
-
 
 	/*
 	Loads the map as well as position the search bar and list.	On a search, clearMarkers removes all markers already on the map and removes all info in allPlaces.	Then, once a search is complete, populates more markers and sends the info to getAllPlaces to populate allPlaces again. Zoom level 0-19; 0 for a planetary view and 19 to a very local view
@@ -91,6 +78,8 @@ function appOctopus() {
 		//		map.setCenter(kapahulu);
 		computeCenter();
 		self.getFoursquareInfo();
+
+
 		// Create the DIV to hold the control and
 		// call the CenterControl() constructor passing
 		// in this DIV.
@@ -137,7 +126,8 @@ function appOctopus() {
 			google.maps.event.addListener(map, 'tilesloaded', function() {
 				window.clearTimeout(timer);
 			});
-		}
+}
+
 		// Will let the user know when Google Maps fails to load.
 		function failedToLoad() {
 			$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
@@ -147,15 +137,24 @@ function appOctopus() {
 		Function to pre-populate the map with place types.	nearbySearch retuns up to 20 places.
 		*/
 		function getPlaces() {
-			var request = {
+			var request1 = {
 				location: kapahulu,
 				radius: 700,
-				types: ['meal_takeaway', 'restaurant', 'bar', 'cafe', 'food']
+				types: ['meal_takeaway', 'restaurant', 'bar', 'cafe', 'food'],
+//				rankBy: 'DISTANCE'
+			};
+
+			var request2 = {
+				location: kapahulu,
+				radius: 700,
+				types: ['meal_takeaway', 'restaurant', 'bar', 'cafe', 'food'],
+				query: 'restaurant'
 			};
 
 			infowindow = new google.maps.InfoWindow();
 			service = new google.maps.places.PlacesService(map);
-			service.nearbySearch(request, callback);
+			service.nearbySearch(request1, callback);
+			service.textSearch(request2, callback);
 		}
 
 		/*
@@ -296,5 +295,5 @@ function appOctopus() {
 		}
 
 		$(function(){
-			ko.applyBindings(new appOctopus());
+			ko.applyBindings(new neighborhoodMapViewModel());
 		});

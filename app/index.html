@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="ie=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="description" content="interesting places near Kapahulu, Diamond Head, and Waikiki Oahu Hawaii">
-		<meta name="author" content="Alf Maglalang">
-		<title>What is in my neighborhood</title>
-		<link href="libs/normalize.css" rel="stylesheet">
-		<!-- link href="libs/skeleton.css" rel="stylesheet" -->
-		<!-- link href="libs/bootstrap-theme.min.css" rel="stylesheet" -->
-		<link href="libs/bootstrap.min.css" rel="stylesheet">
-		<link href="styles/style.css" rel="stylesheet">
-		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
-	</head>
-	<body>
-		<!-- Page Content -->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="interesting places near Kapahulu, Diamond Head, and Waikiki Oahu Hawaii">
+	<meta name="author" content="Alf Maglalang">
+	<title>What is in my neighborhood</title>
+	<link href="libs/normalize.css" rel="stylesheet">
+	<!-- link href="libs/skeleton.css" rel="stylesheet" -->
+	<!-- link href="libs/bootstrap-theme.min.css" rel="stylesheet" -->
+	<link href="libs/bootstrap.min.css" rel="stylesheet">
+	<link href="styles/style.css" rel="stylesheet">
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
+</head>
+<body>
+	<!-- Page Content -->
 
-		<div class="container">
+	<div class="container">
 
-				<div class="row">
-						<!-- map here -->
-						<div class="col-xs-12 map">
+		<div class="row">
+			<!-- map here -->
+			<div class="col-xs-12 map">
 
-							<input id="pac-input" class="controls" type="text"
-					        placeholder="If you want more info... ">
-						<div id="map-canvas"></div>
+				<input id="pac-input" class="controls" type="text"
+				placeholder="If you want more info... ">
+				<div id="map-canvas"></div>
 
-						<!-- list here -->
-						<div id="list">
-				        <h2>Check Out</h2>
-				        <ul data-bind="foreach: allPlaces">
-				            <li data-bind="click: $parent.clickMarker">
-				            <hr>
-				                <p class="name"><span data-bind="text: name"><span></p>
-				                <p class="address"><span data-bind="text: address"></span></p>
-				            </li>
-				        </ul>
-				    </div>
+				<!-- list here -->
+				<div id="list">
+					<h2>Check Out</h2>
+					<ul data-bind="foreach: allPlaces">
+						<li data-bind="click: $parent.clickMarker">
+							<hr>
+							<p class="name"><span data-bind="text: name"><span></p>
+								<p class="address"><span data-bind="text: address"></span></p>
+							</li>
+						</ul>
+					</div>
 				</div>
 				<!-- /.row -->
 
-		</div>
-		<!-- /.container -->
+			</div>
+			<!-- /.container -->
 
-		<script src="libs/knockout.js"></script>
-		<script src="libs/jquery.min.js"></script>
-		<script src="libs/bootstrap.min.js"></script>
+			<script src="libs/knockout.js"></script>
+			<script src="libs/jquery.min.js"></script>
+			<script src="libs/bootstrap.min.js"></script>
 
-		<!-- build:js scripts/main.min.js -->
-		<script src="scripts/model.js"></script>
-		<script src="scripts/vmapp.js"></script>
-		<!-- endbuild -->
-	</body>
-</html>
+			<!-- build:js scripts/main.min.js -->
+			<script src="scripts/model.js"></script>
+			<script src="scripts/vmapp.js"></script>
+			<!-- endbuild -->
+		</body>
+		</html>
