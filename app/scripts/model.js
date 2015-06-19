@@ -53,16 +53,13 @@ function neighborhoodMapViewModel() {
 
 		this.isVisible(true);
 
-		// var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
-		//
-		// google.maps.event.addListener(marker, 'click', function() {
-		// 	infowindow.setContent(contentString);
-		// 	infowindow.open(map, this);
-		// 	map.panTo(marker.position);
-		// 	marker.setAnimation(google.maps.Animation.BOUNCE);
-		// 	setTimeout(function(){marker.setAnimation(null);}, 1450);
-		// });
-		// markersArray.push(marker);
+		var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
+
+		google.maps.event.addListener(marker, 'click', function() {
+			infowindow.setContent(contentString);
+			infowindow.open(map, marker);
+			map.panTo(marker.position);
+		});
 	};
 
 	/**
@@ -215,6 +212,15 @@ function neighborhoodMapViewModel() {
 
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 				bounds.extend(new google.maps.LatLng(latitude,longitude));
+
+				// var contentString = '<div style="font-weight: bold">' + place.name + '</div><br>' + place.formatted_address;
+				//
+				// google.maps.event.addListener(pin, 'click', function() {
+				// 	infowindow.setContent(contentString);
+				// 	infowindow.open(map, this);
+				// 	map.panTo(pin.position);
+				// });
+
 				self.pins.push(pin);
 
 			});
