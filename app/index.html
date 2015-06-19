@@ -24,7 +24,7 @@
 			<div class="col-xs-12 map">
 
 				<input id="pac-input" class="controls" type="text"
-				placeholder="If you want more info... ">
+				placeholder="If you want more info... " data-bind="value: name">
 				<div id="map-canvas"></div>
 
 				<!-- list here -->
@@ -34,7 +34,7 @@
 						<li data-bind="click: $parent.clickMarker">
 							<hr>
 							<p class="name"><span data-bind="text: name"><span></p>
-								<p class="address"><span data-bind="text: address"></span></p>
+								<!-- p class="address"><span data-bind="text: address"></span></p -->
 							</li>
 						</ul>
 					</div>
