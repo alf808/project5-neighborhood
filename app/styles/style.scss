@@ -22,6 +22,7 @@ body {
 div#list h2 {
 	text-align: center;
 	margin-top: .25em;
+	font-size: 2em;
 }
 ul {
 	padding: 0;
@@ -50,59 +51,6 @@ hr {
 	height: 100%;
 	width: 100%;
 //	height:calc(100% - 0px);
-}
-
-.myhood-list ul,
-.search-myhood {
-	position:fixed;
-	top:0;
-	right:0;
-	width:400px;
-	background-color:rgba(white, 0.85);
-}
-
-.myhood-list ul {
-	margin-right:-100%;
-	padding:60px 0 20px;
-	height:100%;
-	overflow-y:auto;
-	z-index:9;
-//	@include transition-property(all);
-//	@include transition-duration(0.5s);
-	&.show {
-		margin-right:0;
-	}
-	h3 {
-		font-size:24px;
-		font-weight:400;
-		line-height:1.42em;
-		margin-top:0;
-		color:$myhood-red;
-		span {
-			border-bottom:1px solid $myhood-red;
-		}
-	}
-	p {
-		span {
-			display:block;
-		}
-	}
-	li {
-		list-style:none;
-		margin:0;
-		padding:30px 20px 20px;
-		border-top:1px dashed #ccc;
-		cursor:pointer;
-		&:first-child {
-			border-top:0;
-		}
-		&:hover {
-			background-color:lightyellow;
-		}
-		&.active {
-			background-color:#efefef;
-		}
-	}
 }
 
 .reset-button {
@@ -147,7 +95,7 @@ text-align: center;
 	padding: 0;
 	overflow: auto;
 	width: 25%;
-	height: 80%;
+	height: 93%;
 	overflow-y: scroll;
 	top: 1em;
 	opacity: .9;

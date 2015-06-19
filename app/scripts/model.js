@@ -4,31 +4,18 @@ function neighborhoodMapViewModel() {
 	var self = this;
 	var service;
 	var infowindow;
+	// kapahulu area's latitude and longitude
 	var lat = 21.2790587;
 	var lng = -157.81368810000004;
 	var kapahulu = new google.maps.LatLng(lat, lng);
-	var markersArray = [];
-	self.pins = ko.observableArray([]);
 
 	// array to hold info for knockout
-	// self.allPlaces = ko.observableArray([]);
-	// self.pins = ko.observableArray([]);
+	// var markersArray = [];
+	self.pins = ko.observableArray([]);
+	// self.query = ko.observable('');
+
 	// string to hold foursquare information
 	self.foursquareInfo = '';
-
-
-	// self.filterPins = ko.computed(function () {
-	// 	var search  = self.query().toLowerCase();
-	//
-	// 	return ko.utils.arrayFilter(self.pins(), function (pin) {
-	// 		var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
-	//
-	// 		pin.isVisible(doesMatch);
-	//
-	// 		return doesMatch;
-	// 	});
-	// });
-
 
 	// Finds the center of the map to get lat and lng values
 	function computeCenter() {
@@ -54,7 +41,6 @@ function neighborhoodMapViewModel() {
 			place_id: id,
 			animation: google.maps.Animation.DROP
 		});
-// self.pins.push(marker);
 		this.isVisible = ko.observable(false);
 
 		this.isVisible.subscribe(function(currentState) {
@@ -102,7 +88,7 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
 		});
-
+		// self.query(null);
 	}
 
 
@@ -113,7 +99,7 @@ function neighborhoodMapViewModel() {
 	var input = (document.getElementById('pac-input'));
 	var mapDiv = document.getElementById('map-canvas');
 	var mapOptions = {
-		zoom: 13,
+		zoom: 14,
 		maxZoom: 18,
 		minZoom: 9,
 		center: kapahulu,
@@ -174,37 +160,13 @@ function neighborhoodMapViewModel() {
 			searchBox.setBounds(bounds);
 		});
 		// Handles an event where Google Maps taks too long to load
-		var timer = window.setTimeout(failedToLoad, 5000);
+		var timer = window.setTimeout(failedToLoad, 8000);
 		google.maps.event.addListener(map, 'tilesloaded', function() {
 			window.clearTimeout(timer);
 		});
-		console.log(self.pins());
+		// console.log(self.pins());
 	}
 	// end of initialize
-	//
-	//
-
-	// array for prepopulation of list
-	// self.onloadList = ko.observableArray([]);
-	// self.query = ko.observable('');
-	//
-	// // returns a filtered list of corners if name contains `self.query` data
-	// self.filteredInitList = ko.computed(function() {
-	// 	// loop through corners and clear map markers
-	// 	self.onloadList().forEach(function(corner) {
-	// 		corner.marker.setMap(null);
-	// 	});
-	//
-	// 	// filter results where name contains `self.query`
-	// 	var results = ko.utils.arrayFilter(self.onloadList(), function(corner) {
-	// 		return corner.name().toLowerCase().contains(self.query().toLowerCase());
-	// 	});
-	//
-	// 	// go through results and set marker to visible
-	// 	results.forEach(function(corner) {
-	// 		corner.marker.setMap(map);
-	// 	});
-	// });
 	// Will let the user know when Google Maps fails to load.
 	function failedToLoad() {
 		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
@@ -216,7 +178,7 @@ function neighborhoodMapViewModel() {
 	function getPlaces() {
 		var request1 = {
 			location: kapahulu,
-			radius: 700,
+			radius: 600,
 			types: ['meal_takeaway', 'restaurant', 'bar', 'cafe', 'food'],
 		};
 
@@ -225,6 +187,7 @@ function neighborhoodMapViewModel() {
 		service.nearbySearch(request1, callback);
 	}
 
+// this is interface to bound values in view
 	self.query = ko.observable('');
 	self.filterPins = ko.computed(function () {
 			var search  = self.query().toLowerCase();
@@ -254,13 +217,9 @@ function neighborhoodMapViewModel() {
 				bounds.extend(new google.maps.LatLng(latitude,longitude));
 				self.pins.push(pin);
 
-				// self.query = ko.observable('');
-
-
 			});
 			map.fitBounds(bounds);
 
-			// results.forEach(getAllPlaces);
 		}
 	}
 
@@ -322,36 +281,6 @@ function neighborhoodMapViewModel() {
 	// 	marker.setAnimation(google.maps.Animation.DROP);
 	// };
 
-
-	/*
-	function that gets the information from all the places that we are going to search and also pre-populate.	Pushes this info to the allPlaces array for knockout.
-	*/
-	// function getAllPlaces(place){
-	// 	var myPlace = {};
-	// 	myPlace.place_id = place.place_id;
-	// 	myPlace.position = place.geometry.location.toString();
-	// 	myPlace.name = place.name;
-	//
-	// 	var address;
-	// 	if (place.vicinity !== undefined) {
-	// 		address = place.vicinity;
-	// 	} else if (place.formatted_address !== undefined) {
-	// 		address = place.formatted_address;
-	// 	}
-	// 	myPlace.address = address;
-	//
-	// 	self.allPlaces.push(myPlace);
-	// }
-
-	/*
-	called after a search, this function clears any markers in the markersArray so that we can start with fresh map with new markers.
-	*/
-	// function clearMarkers() {
-	// 	for (var i = 0; i < markersArray.length; i++ ) {
-	// 		markersArray[i].setMap(null);
-	// 	}
-	// 	markersArray.length = 0;
-	// }
 
 	google.maps.event.addDomListener(window, 'load', initialize);
 }
