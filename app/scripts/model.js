@@ -11,23 +11,23 @@ function neighborhoodMapViewModel() {
 	self.pins = ko.observableArray([]);
 
 	// array to hold info for knockout
-	self.allPlaces = ko.observableArray([]);
+	// self.allPlaces = ko.observableArray([]);
 	// self.pins = ko.observableArray([]);
 	// string to hold foursquare information
 	self.foursquareInfo = '';
 
 
-	self.filterPins = ko.computed(function () {
-		var search  = self.query().toLowerCase();
-
-		return ko.utils.arrayFilter(self.pins(), function (pin) {
-			var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
-
-			pin.isVisible(doesMatch);
-
-			return doesMatch;
-		});
-	});
+	// self.filterPins = ko.computed(function () {
+	// 	var search  = self.query().toLowerCase();
+	//
+	// 	return ko.utils.arrayFilter(self.pins(), function (pin) {
+	// 		var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
+	//
+	// 		pin.isVisible(doesMatch);
+	//
+	// 		return doesMatch;
+	// 	});
+	// });
 
 
 	// Finds the center of the map to get lat and lng values
@@ -54,7 +54,7 @@ function neighborhoodMapViewModel() {
 			place_id: id,
 			animation: google.maps.Animation.DROP
 		});
-
+// self.pins.push(marker);
 		this.isVisible = ko.observable(false);
 
 		this.isVisible.subscribe(function(currentState) {
@@ -178,44 +178,33 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addListener(map, 'tilesloaded', function() {
 			window.clearTimeout(timer);
 		});
+		console.log(self.pins());
 	}
 	// end of initialize
 	//
 	//
-	//  self.query = ko.observable('');
-	// self.filterPins = ko.computed(function () {
-	//     var search  = self.query().toLowerCase();
-	//
-	//     return ko.utils.arrayFilter(self.pins(), function (pin) {
-	//         var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
-	//
-	//         pin.isVisible(doesMatch);
-	//
-	//         return doesMatch;
-	//     });
-	// });
 
 	// array for prepopulation of list
-	self.onloadList = ko.observableArray([]);
-	self.query = ko.observable('');
-
-	// returns a filtered list of corners if name contains `self.query` data
-	self.filteredInitList = ko.computed(function() {
-		// loop through corners and clear map markers
-		self.onloadList().forEach(function(corner) {
-			corner.marker.setMap(null);
-		});
-
-		// filter results where name contains `self.query`
-		var results = ko.utils.arrayFilter(self.cornerList(), function(corner) {
-			return corner.name().toLowerCase().contains(self.query().toLowerCase());
-		});
-
-		// go through results and set marker to visible
-		results.forEach(function(corner) {
-			corner.marker.setMap(map);
-		});
-	});
+	// self.onloadList = ko.observableArray([]);
+	// self.query = ko.observable('');
+	//
+	// // returns a filtered list of corners if name contains `self.query` data
+	// self.filteredInitList = ko.computed(function() {
+	// 	// loop through corners and clear map markers
+	// 	self.onloadList().forEach(function(corner) {
+	// 		corner.marker.setMap(null);
+	// 	});
+	//
+	// 	// filter results where name contains `self.query`
+	// 	var results = ko.utils.arrayFilter(self.onloadList(), function(corner) {
+	// 		return corner.name().toLowerCase().contains(self.query().toLowerCase());
+	// 	});
+	//
+	// 	// go through results and set marker to visible
+	// 	results.forEach(function(corner) {
+	// 		corner.marker.setMap(map);
+	// 	});
+	// });
 	// Will let the user know when Google Maps fails to load.
 	function failedToLoad() {
 		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
@@ -236,6 +225,19 @@ function neighborhoodMapViewModel() {
 		service.nearbySearch(request1, callback);
 	}
 
+	self.query = ko.observable('');
+	self.filterPins = ko.computed(function () {
+			var search  = self.query().toLowerCase();
+
+			return ko.utils.arrayFilter(self.pins(), function (pin) {
+					var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
+
+					pin.isVisible(doesMatch);
+
+					return doesMatch;
+			});
+	});
+
 	/*
 	Gets the callback from Google and creates a marker for each place.	Sends info to getAllPlaces.
 	*/
@@ -250,9 +252,15 @@ function neighborhoodMapViewModel() {
 
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 				bounds.extend(new google.maps.LatLng(latitude,longitude));
+				self.pins.push(pin);
+
+				// self.query = ko.observable('');
+
+
 			});
 			map.fitBounds(bounds);
-			results.forEach(getAllPlaces);
+
+			// results.forEach(getAllPlaces);
 		}
 	}
 
@@ -318,32 +326,32 @@ function neighborhoodMapViewModel() {
 	/*
 	function that gets the information from all the places that we are going to search and also pre-populate.	Pushes this info to the allPlaces array for knockout.
 	*/
-	function getAllPlaces(place){
-		var myPlace = {};
-		myPlace.place_id = place.place_id;
-		myPlace.position = place.geometry.location.toString();
-		myPlace.name = place.name;
-
-		var address;
-		if (place.vicinity !== undefined) {
-			address = place.vicinity;
-		} else if (place.formatted_address !== undefined) {
-			address = place.formatted_address;
-		}
-		myPlace.address = address;
-
-		self.allPlaces.push(myPlace);
-	}
+	// function getAllPlaces(place){
+	// 	var myPlace = {};
+	// 	myPlace.place_id = place.place_id;
+	// 	myPlace.position = place.geometry.location.toString();
+	// 	myPlace.name = place.name;
+	//
+	// 	var address;
+	// 	if (place.vicinity !== undefined) {
+	// 		address = place.vicinity;
+	// 	} else if (place.formatted_address !== undefined) {
+	// 		address = place.formatted_address;
+	// 	}
+	// 	myPlace.address = address;
+	//
+	// 	self.allPlaces.push(myPlace);
+	// }
 
 	/*
 	called after a search, this function clears any markers in the markersArray so that we can start with fresh map with new markers.
 	*/
-	function clearMarkers() {
-		for (var i = 0; i < markersArray.length; i++ ) {
-			markersArray[i].setMap(null);
-		}
-		markersArray.length = 0;
-	}
+	// function clearMarkers() {
+	// 	for (var i = 0; i < markersArray.length; i++ ) {
+	// 		markersArray[i].setMap(null);
+	// 	}
+	// 	markersArray.length = 0;
+	// }
 
 	google.maps.event.addDomListener(window, 'load', initialize);
 }
