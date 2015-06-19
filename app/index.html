@@ -24,16 +24,18 @@
 			<div class="col-xs-12 map">
 
 				<input id="pac-input" class="controls" type="text"
-				placeholder="If you want more info... " data-bind="value: query">
+				placeholder="If you want more info... " data-bind="value: query, valueUpdate: 'keyup'">
 				<div id="map-canvas"></div>
 
 				<!-- list here -->
 				<div id="list">
 					<h2>Check Out</h2>
-					<ul data-bind="foreach: filterPins">
-						<li data-bind="click: clickMarker">
+					<ul data-bind="foreach: {data: filteredInitList, as: 'corner'}">
+						<li>
+							<!-- a data-bind="text: name"></a -->
+						<!-- li data-bind="click: clickMarker" -->
 							<hr>
-							<p class="name"><span data-bind="text: name"><span></p>
+							<p class="name"><span data-bind="text: corner.name"></span></p>
 								<!-- p class="address"><span data-bind="text: address"></span></p -->
 							</li>
 						</ul>
