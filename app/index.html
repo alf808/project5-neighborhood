@@ -23,8 +23,9 @@
 			<!-- map here -->
 			<div class="col-xs-12 map">
 
-				<input id="pac-input" class="controls" type="text"
-				placeholder="If you want more info... " data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
+				<!-- input id="pac-input" class="controls" type="text"
+				placeholder="If you want more info... " data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off" -->
+				<input id="pac-input" class="controls" type="text" placeholder="If you want more info... " data-bind="textInput: query" autocomplete="off">
 				<div id="map-canvas"></div>
 
 				<!-- list here -->

@@ -134,31 +134,31 @@ function neighborhoodMapViewModel() {
 		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(centerControlDiv);
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-		var searchBox = new google.maps.places.SearchBox((input));
-		google.maps.event.addListener(searchBox, 'places_changed', function() {
-			var places = searchBox.getPlaces();
+		// var searchBox = new google.maps.places.SearchBox((input));
+		// google.maps.event.addListener(searchBox, 'places_changed', function() {
+		// 	var places = searchBox.getPlaces();
 			// clearMarkers();
 			// self.allPlaces.removeAll();
-			var bounds = new google.maps.LatLngBounds();
+			// var bounds = new google.maps.LatLngBounds();
 
 
-			for(var i=0, place; i<10; i++){
-				if (places[i] !== undefined){
-					place = places[i];
+			// for(var i=0, place; i<10; i++){
+			// 	if (places[i] !== undefined){
+			// 		place = places[i];
 
 					// getAllPlaces(place);
 					// createMarker(place);
 					// var pin = new Pin(map, place.name, place.geometry.location.lat(), place.geometry.location.lng(), place.place_id, place.text);
-					bounds.extend(place.geometry.location);
-				}
-			}
-			map.fitBounds(bounds);
-			computeCenter();
-		});
-		google.maps.event.addListener(map, 'bounds_changed', function(){
-			var bounds = map.getBounds();
-			searchBox.setBounds(bounds);
-		});
+			// 		bounds.extend(place.geometry.location);
+			// 	}
+			// }
+		// 	map.fitBounds(bounds);
+		// 	computeCenter();
+		// });
+		// google.maps.event.addListener(map, 'bounds_changed', function(){
+		// 	var bounds = map.getBounds();
+		// 	searchBox.setBounds(bounds);
+		// });
 		// Handles an event where Google Maps taks too long to load
 		var timer = window.setTimeout(failedToLoad, 8000);
 		google.maps.event.addListener(map, 'tilesloaded', function() {
@@ -179,7 +179,7 @@ function neighborhoodMapViewModel() {
 		var request1 = {
 			location: kapahulu,
 			radius: 600,
-			types: ['meal_takeaway', 'restaurant', 'bar', 'cafe', 'food'],
+			types: ['restaurant', 'cafe', 'food'],
 		};
 
 		infowindow = new google.maps.InfoWindow();
