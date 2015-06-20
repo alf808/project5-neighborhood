@@ -13,7 +13,7 @@ function neighborhoodMapViewModel() {
 	// array to hold info for knockout
 	// var markersIdArray = [];
 	self.pins = ko.observableArray([]);
-	// self.query = ko.observable('');
+	self.query = ko.observable('');
 
 	// string to hold foursquare information
 	self.foursquareInfo = '';
@@ -56,7 +56,7 @@ function neighborhoodMapViewModel() {
 
 		createMarker(marker,this);
 	};
-self.query = ko.observable('');
+// self.query = ko.observable('');
 	/**
 	* The CenterControl adds a control to the map that recenters the map on Neighborhood.
 	* This constructor takes the control DIV as an argument.
