@@ -42,6 +42,7 @@ function neighborhoodMapViewModel() {
 			place_id: id,
 			animation: google.maps.Animation.DROP
 		});
+		this.marker = marker;
 		this.isVisible = ko.observable(false);
 
 		this.isVisible.subscribe(function(currentState) {
@@ -54,13 +55,14 @@ function neighborhoodMapViewModel() {
 
 		this.isVisible(true);
 
-		var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
-
-		google.maps.event.addListener(marker, 'click', function() {
-			infowindow.setContent(contentString);
-			infowindow.open(map, marker);
-			map.panTo(marker.position);
-		});
+		// var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
+		createMarker(marker);
+		// google.maps.event.addListener(marker, 'click', function() {
+		// 	self.clickMarker(this);
+		// 	// infowindow.setContent(contentString);
+		// 	// infowindow.open(map, marker);
+			// map.panTo(marker.position);
+		// });
 	};
 
 	/**
@@ -70,25 +72,22 @@ function neighborhoodMapViewModel() {
 	*/
 	function CenterControl(controlDiv, map) {
 
-		// Set CSS for the control border
+		// Set CSS for the control border and text
 		var controlUI = document.createElement('div');
 		controlUI.className = "reset-button";
 		controlUI.title = 'Click to recenter the map';
 		controlDiv.appendChild(controlUI);
-
-		// Set CSS for the control interior
 		var controlText = document.createElement('div');
 		controlText.className = "reset-button-text";
 		controlText.innerHTML = 'Center Map';
 		controlUI.appendChild(controlText);
 
-		// Setup the click event listeners: simply set the map to kapahulu
+		// Setup the click event listeners: simply reset the map to kapahulu
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
 		});
 		// self.query(null);
 	}
-
 
 	/*
 	Loads the map as well as position the search bar and list.	On a search, clearMarkers removes all markers already on the map and removes all info in allPlaces.	Then, once a search is complete, populates more markers and sends the info to getAllPlaces to populate allPlaces again. Zoom level 0-19; 0 for a planetary view and 19 to a very local view
@@ -97,9 +96,9 @@ function neighborhoodMapViewModel() {
 	var input = (document.getElementById('pac-input'));
 	var mapDiv = document.getElementById('map-canvas');
 	var mapOptions = {
-		zoom: 14,
+		zoom: 16,
 		maxZoom: 18,
-		minZoom: 9,
+		minZoom: 10,
 		center: kapahulu,
 		disableDefaultUI: true,
 		zoomControl: true,
@@ -120,9 +119,7 @@ function neighborhoodMapViewModel() {
 		getPlaces();
 		computeCenter();
 		// self.getFoursquareInfo();
-		// Create the DIV to hold the control and
-		// call the CenterControl() constructor passing
-		// in this DIV.
+		// Create the DIV to hold the control and call the CenterControl() constructor
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(self.list);
 
 		var centerControlDiv = document.createElement('div');
@@ -144,6 +141,20 @@ function neighborhoodMapViewModel() {
 		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
 	}
 
+	// This interfaces to bound values in view
+	self.query = ko.observable('');
+	self.filterPins = ko.computed(function () {
+			var search  = self.query().toLowerCase();
+
+			return ko.utils.arrayFilter(self.pins(), function (pin) {
+					var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
+
+					pin.isVisible(doesMatch);
+
+					return doesMatch;
+			});
+	});
+
 	/*
 	Function to pre-populate the map with place types. nearbySearch retuns up to 20 places.
 	*/
@@ -159,26 +170,12 @@ function neighborhoodMapViewModel() {
 		service.nearbySearch(request1, callback);
 	}
 
-// This interfaces to bound values in view
-	self.query = ko.observable('');
-	self.filterPins = ko.computed(function () {
-			var search  = self.query().toLowerCase();
-
-			return ko.utils.arrayFilter(self.pins(), function (pin) {
-					var doesMatch = pin.name().toLowerCase().indexOf(search) >= 0;
-
-					pin.isVisible(doesMatch);
-
-					return doesMatch;
-			});
-	});
-
 	/*
 	Gets the callback from Google and creates a Pin marker for each place.
 	*/
 	function callback(results, status) {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			bounds = new google.maps.LatLngBounds();
+			// bounds = new google.maps.LatLngBounds();
 			results.forEach(function (place){
 				// place.marker = createMarker(place);
 				// createMarker(place);
@@ -186,67 +183,66 @@ function neighborhoodMapViewModel() {
 				var longitude = place.geometry.location.lng();
 
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
-				bounds.extend(new google.maps.LatLng(latitude,longitude));
-
+				// bounds.extend(new google.maps.LatLng(latitude,longitude));
+				// createMarker(place);
 				self.pins.push(pin);
-				markersIdArray.push(place);
+				// markersIdArray.push(place);
 
 			});
-			map.fitBounds(bounds);
+			// map.fitBounds(bounds);
 		}
 	}
 
 	/*
 	Function to create a marker at each place.	This is called on load of the map with the pre-populated list, and also after each search.	Also sets the content of each place's infowindow.
 	*/
-	// function createMarker(place) {
-	// 	var latitude = place.geometry.location.lat();
-	// 	var longitude = place.geometry.location.lng();
-	// 	var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
+	function createMarker(marker) {
+		// var latitude = place.geometry.location.lat();
+		// var longitude = place.geometry.location.lng();
+		// var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 	// var marker = new google.maps.Marker({
 	// 	map: map,
-	// 	icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-	// 	name: place.name.toLowerCase(),
+	// 	icon: 'img/red-dot.png',
+	// 	name: place.name,
 	// 	position: place.geometry.location,
 	// 	place_id: place.place_id,
 	// 	animation: google.maps.Animation.DROP
 	// });
+	// var marker = place.marker;
 	// var address;
 	// if (place.vicinity !== undefined) {
 	// 	address = place.vicinity;
 	// } else if (place.formatted_address !== undefined) {
 	// 	address = place.formatted_address;
 	// }
-	// var contentString = '<div style="font-weight: bold">' + place.name + '</div><br>' + address + '<br>' + self.foursquareInfo ;
+	var contentString = '<div style="font-weight: bold">' + 'hello' + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
 
-	// google.maps.event.addListener(marker, 'click', function() {
-	// 	infowindow.setContent(contentString);
-	// 	infowindow.open(map, this);
-	// 	map.panTo(marker.position);
-	// 	marker.setAnimation(google.maps.Animation.BOUNCE);
-	// 	setTimeout(function(){marker.setAnimation(null);}, 1450);
-	// });
-	// pins.push(pin);
+	google.maps.event.addListener(marker, 'click', function() {
+		infowindow.setContent(contentString);
+		infowindow.open(map, marker);
+		map.panTo(marker.position);
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function(){marker.setAnimation(null);}, 1450);
+	});
 	// return marker;
-	// }
-
+	}
 
 	/*
 	Function that will pan to the position and open an info window of an item clicked in the list.
 	*/
-	self.clickMarker = function(pin) {
-		var marker;
+	self.clickMarker = function(place) {
+		// var marker;
 		// var numMarkers = markersIdArray.length;
-		var pos = new google.maps.LatLng(pin.lat(), pin.lon());
-		console.log(pin);
-		console.log(pin.name());
+		var pos = new google.maps.LatLng(place.lat(), place.lon());
+		console.log(pos);
+		// console.log(pin.name());
 
-		marker = new google.maps.Marker({
-			icon: 'img/red-dot.png',
-			position: pos,
-			place_id: pin.pid(),
-			animation: google.maps.Animation.DROP
-		});
+		// marker = new google.maps.Marker({
+		// 	icon: 'img/red-dot.png',
+		// 	position: pos,
+		// 	place_id: pin.pid(),
+		// 	animation: google.maps.Animation.DROP
+		// });
 
 		// console.log(numMarkers);
 		// for(var i = 0; i < numMarkers; i++) {
@@ -257,12 +253,11 @@ function neighborhoodMapViewModel() {
 		// }
 	// self.getFoursquareInfo(place);
 	// self.getFoursquareInfo();
-		map.panTo(pos);
 
-		var contentString = '<div style="font-weight: bold">' + pin.name() + '</div>';
+		var contentString = '<div style="font-weight: bold">' + 'hello' + '</div>';
 		infowindow.setContent(contentString);
-		infowindow.open(map, marker);
-		// pin.setAnimation(google.maps.Animation.DROP);
+		infowindow.open(map, place.marker);
+		map.panTo(pos);
 	};
 
 
