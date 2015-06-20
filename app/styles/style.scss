@@ -22,6 +22,7 @@ body {
 div#list h2 {
 	text-align: center;
 	margin-top: .25em;
+	font-size: 1.75em;
 }
 ul {
 	padding: 0;
@@ -52,109 +53,55 @@ hr {
 //	height:calc(100% - 0px);
 }
 
-.myhood-list ul,
-.search-myhood {
-	position:fixed;
-	top:0;
-	right:0;
-	width:400px;
-	background-color:rgba(white, 0.85);
-}
-
-.myhood-list ul {
-	margin-right:-100%;
-	padding:60px 0 20px;
-	height:100%;
-	overflow-y:auto;
-	z-index:9;
-//	@include transition-property(all);
-//	@include transition-duration(0.5s);
-	&.show {
-		margin-right:0;
-	}
-	h3 {
-		font-size:24px;
-		font-weight:400;
-		line-height:1.42em;
-		margin-top:0;
-		color:$myhood-red;
-		span {
-			border-bottom:1px solid $myhood-red;
-		}
-	}
-	p {
-		span {
-			display:block;
-		}
-	}
-	li {
-		list-style:none;
-		margin:0;
-		padding:30px 20px 20px;
-		border-top:1px dashed #ccc;
-		cursor:pointer;
-		&:first-child {
-			border-top:0;
-		}
-		&:hover {
-			background-color:lightyellow;
-		}
-		&.active {
-			background-color:#efefef;
-		}
-	}
-}
-
 .reset-button {
 	background-color: $yellow;
 border: 2px solid #fff;
 border-radius: 3px;
-box-shadow: 0 2px 6px rgba(0,0,0,.3);
+box-shadow: 0 2px .375em rgba(0,0,0,.3);
 cursor: pointer;
-margin-bottom: 22px;
-margin-left: 5px;
+margin-bottom: 1.375em;
+margin-left: .375em;
 text-align: center;
 }
 
 .reset-button-text {
-	font-size: 16px;
+	font-size: 1.25em;
 	color: rgb(25,25,25);
-	line-height: 38px;
-	padding-left: 5px;
-	padding-right: 5px;
+	line-height: 2.375em;
+	padding-left: .375em;
+	padding-right: .375em;
 
 }
 
 .controls {
-	margin-top: 16px;
+	margin-top: 1em;
 	border: 1px solid transparent;
 	//Instead of the line below you could use @includeborder-radius($radius, $vertical-radius)
 	border-radius: 2px 0 0 2px;
 	//Instead of the line below you could use @includebox-sizing($bs)
 	box-sizing: border-box;
-	height: 32px;
+	height: 2em;
 	outline: none;
 	//Instead of the line below you could use @includebox-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
-	box-shadow: 0 2px 6px $black_30;
+	box-shadow: 0 2px .375em $black_30;
 }
 
-@media screen and(min-width: 640px) {
+@media screen and(min-width: 500px) {
 #list {
 	background-color: $bluish_white;
-	font-size: 11px;
+	font-size: 1.25em;
 	font-weight: 300;
-	margin-left: 12px;
+	margin-left: .75em;
 	padding: 0;
-	overflow: auto;
-	width: 25%;
-	height: 80%;
-	overflow-y: scroll;
+	overflow: scroll;
+	width: 30%;
+	height: 93%;
 	top: 1em;
 	opacity: .9;
 }
 }
 
-@media screen and(max-width: 639px) {
+@media screen and(max-width: 499px) {
 #list { display: none; }
 }
 
@@ -168,16 +115,16 @@ text-align: center;
 }
 #pac-input {
 	background-color: $white;
-	font-size: 15px;
+	font-size: 1.25em;
 	font-weight: 300;
-	margin-left: 18px;
-	padding: 0 11px 0 13px;
+	margin-left: 1.125em;
+	padding: 0 .688em 0 .813em;
 	text-overflow: ellipsis;
 	width: 40%;
 	&:focus {
 		border-color: $color_cornflower_blue_approx;
 //		margin-left: -1px;
-		padding-left: 14px;
+		padding-left: .875em;
 		width: 41%;
 	}
 }
@@ -185,13 +132,13 @@ text-align: center;
 #type-selector {
 	color: $white;
 	background-color: $color_cornflower_blue_approx;
-	padding: 5px 11px 0;
+	padding: 5px .688em 0;
 	label {
-		font-size: 13px;
+		font-size: .813em;
 		font-weight: 300;
 	}
 }
 p.name {
-	font-size: 14px;
+	font-size: .875em;
 	font-weight: bold;
 }
