@@ -29,11 +29,11 @@
 				<!-- list here -->
 				<div id="list">
 					<h2>Check Out</h2>
-						<ul data-bind="foreach: filterPins">
-						<li>
-						<!-- li data-bind="click: clickMarker" -->
+						<ul data-bind="foreach: {data: filterPins, as: 'pin'}">
+							<li data-bind="click: $parent.clickMarker">
+							<!-- li -->
 							<hr>
-							<p class="name"><span data-bind="text: name"></span></p>
+							<p class="name"><span data-bind="text: pin.name"></span></p>
 								<!-- p class="address"><span data-bind="text: address"></span></p -->
 							</li>
 						</ul>

@@ -10,7 +10,7 @@ function neighborhoodMapViewModel() {
 	var kapahulu = new google.maps.LatLng(lat, lng);
 
 	// array to hold info for knockout
-	// var markersArray = [];
+	var markersIdArray = [];
 	self.pins = ko.observableArray([]);
 	// self.query = ko.observable('');
 
@@ -34,9 +34,10 @@ function neighborhoodMapViewModel() {
 		this.lat  = ko.observable(lat);
 		this.lon  = ko.observable(lon);
 		this.text = ko.observable(text);
+		this.pid = ko.observable(id);
 
 		marker = new google.maps.Marker({
-			icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+			icon: 'img/red-dot.png',
 			position: new google.maps.LatLng(lat, lon),
 			place_id: id,
 			animation: google.maps.Animation.DROP
@@ -131,46 +132,20 @@ function neighborhoodMapViewModel() {
 		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(centerControlDiv);
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-		// var searchBox = new google.maps.places.SearchBox((input));
-		// google.maps.event.addListener(searchBox, 'places_changed', function() {
-		// 	var places = searchBox.getPlaces();
-			// clearMarkers();
-			// self.allPlaces.removeAll();
-			// var bounds = new google.maps.LatLngBounds();
-
-
-			// for(var i=0, place; i<10; i++){
-			// 	if (places[i] !== undefined){
-			// 		place = places[i];
-
-					// getAllPlaces(place);
-					// createMarker(place);
-					// var pin = new Pin(map, place.name, place.geometry.location.lat(), place.geometry.location.lng(), place.place_id, place.text);
-			// 		bounds.extend(place.geometry.location);
-			// 	}
-			// }
-		// 	map.fitBounds(bounds);
-		// 	computeCenter();
-		// });
-		// google.maps.event.addListener(map, 'bounds_changed', function(){
-		// 	var bounds = map.getBounds();
-		// 	searchBox.setBounds(bounds);
-		// });
-		// Handles an event where Google Maps taks too long to load
+		// Handles an event where Google Maps takes too long to load
 		var timer = window.setTimeout(failedToLoad, 8000);
 		google.maps.event.addListener(map, 'tilesloaded', function() {
 			window.clearTimeout(timer);
 		});
-		// console.log(self.pins());
 	}
-	// end of initialize
-	// Will let the user know when Google Maps fails to load.
+
+	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
 		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
 	}
 
 	/*
-	Function to pre-populate the map with place types.	nearbySearch retuns up to 20 places.
+	Function to pre-populate the map with place types. nearbySearch retuns up to 20 places.
 	*/
 	function getPlaces() {
 		var request1 = {
@@ -184,7 +159,7 @@ function neighborhoodMapViewModel() {
 		service.nearbySearch(request1, callback);
 	}
 
-// this is interface to bound values in view
+// This interfaces to bound values in view
 	self.query = ko.observable('');
 	self.filterPins = ko.computed(function () {
 			var search  = self.query().toLowerCase();
@@ -199,7 +174,7 @@ function neighborhoodMapViewModel() {
 	});
 
 	/*
-	Gets the callback from Google and creates a marker for each place.	Sends info to getAllPlaces.
+	Gets the callback from Google and creates a Pin marker for each place.
 	*/
 	function callback(results, status) {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -213,19 +188,11 @@ function neighborhoodMapViewModel() {
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 				bounds.extend(new google.maps.LatLng(latitude,longitude));
 
-				// var contentString = '<div style="font-weight: bold">' + place.name + '</div><br>' + place.formatted_address;
-				//
-				// google.maps.event.addListener(pin, 'click', function() {
-				// 	infowindow.setContent(contentString);
-				// 	infowindow.open(map, this);
-				// 	map.panTo(pin.position);
-				// });
-
 				self.pins.push(pin);
+				markersIdArray.push(place);
 
 			});
 			map.fitBounds(bounds);
-
 		}
 	}
 
@@ -260,7 +227,6 @@ function neighborhoodMapViewModel() {
 	// 	setTimeout(function(){marker.setAnimation(null);}, 1450);
 	// });
 	// pins.push(pin);
-	// markersArray.push(marker);
 	// return marker;
 	// }
 
@@ -268,24 +234,36 @@ function neighborhoodMapViewModel() {
 	/*
 	Function that will pan to the position and open an info window of an item clicked in the list.
 	*/
-	// self.clickMarker = function(place) {
-	// 	var marker;
-	//
-	// 	for(var e = 0; e < markersArray.length; e++) {
-	// 		if(place.place_id === markersArray[e].place_id) {
-	// 			marker = markersArray[e];
-	// 			break;
-	// 		}
-	// 	}
+	self.clickMarker = function(pin) {
+		var marker;
+		// var numMarkers = markersIdArray.length;
+		var pos = new google.maps.LatLng(pin.lat(), pin.lon());
+		console.log(pin);
+		console.log(pin.name());
+
+		marker = new google.maps.Marker({
+			icon: 'img/red-dot.png',
+			position: pos,
+			place_id: pin.pid(),
+			animation: google.maps.Animation.DROP
+		});
+
+		// console.log(numMarkers);
+		// for(var i = 0; i < numMarkers; i++) {
+		// 	if(pin.place_id === markersIdArray[i].place_id) {
+		// 		marker = markersIdArray[i];
+		// 		break;
+		// 	}
+		// }
 	// self.getFoursquareInfo(place);
 	// self.getFoursquareInfo();
-	// 	map.panTo(marker.position);
-	//
-	// 	var contentString = '<div style="font-weight: bold">' + place.name + '</div><div>' + place.address + '</div>' + self.foursquareInfo;
-	// 	infowindow.setContent(contentString);
-	// 	infowindow.open(map, marker);
-	// 	marker.setAnimation(google.maps.Animation.DROP);
-	// };
+		map.panTo(pos);
+
+		var contentString = '<div style="font-weight: bold">' + pin.name() + '</div>';
+		infowindow.setContent(contentString);
+		infowindow.open(map, marker);
+		// pin.setAnimation(google.maps.Animation.DROP);
+	};
 
 
 	google.maps.event.addDomListener(window, 'load', initialize);
