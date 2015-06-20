@@ -23,7 +23,6 @@ function neighborhoodMapViewModel() {
 		lat = latAndLng.lat();
 		lng = latAndLng.lng();
 	}
-
 	/**
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
@@ -42,7 +41,7 @@ function neighborhoodMapViewModel() {
 			place_id: id,
 			animation: google.maps.Animation.DROP
 		});
-		// this.marker = marker;
+		this.marker = ko.observable(marker);
 		this.isVisible = ko.observable(false);
 
 		this.isVisible.subscribe(function(currentState) {
@@ -52,17 +51,9 @@ function neighborhoodMapViewModel() {
 				marker.setMap(null);
 			}
 		});
-
 		this.isVisible(true);
 
-		// var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
 		createMarker(marker,this);
-		// google.maps.event.addListener(marker, 'click', function() {
-		// 	self.clickMarker(this);
-		// 	// infowindow.setContent(contentString);
-		// 	// infowindow.open(map, marker);
-			// map.panTo(marker.position);
-		// });
 	};
 
 	/**
@@ -79,13 +70,14 @@ function neighborhoodMapViewModel() {
 		controlDiv.appendChild(controlUI);
 		var controlText = document.createElement('div');
 		controlText.className = "reset-button-text";
-		controlText.innerHTML = 'Center Map';
+		controlText.innerHTML = 'Reset Kapahulu Map';
 		controlUI.appendChild(controlText);
 
 		// Setup the click event listeners: simply reset the map to kapahulu
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
 		});
+		// google.maps.InfoWindow.close();
 		// self.query(null);
 	}
 
@@ -117,7 +109,6 @@ function neighborhoodMapViewModel() {
 
 		map = new google.maps.Map(mapDiv, mapOptions);
 		getPlaces();
-		computeCenter();
 		// self.getFoursquareInfo();
 		// Create the DIV to hold the control and call the CenterControl() constructor
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(self.list);
@@ -154,7 +145,6 @@ function neighborhoodMapViewModel() {
 					return doesMatch;
 			});
 	});
-
 	/*
 	Function to pre-populate the map with place types. nearbySearch retuns up to 20 places.
 	*/
@@ -169,7 +159,6 @@ function neighborhoodMapViewModel() {
 		service = new google.maps.places.PlacesService(map);
 		service.nearbySearch(request1, callback);
 	}
-
 	/*
 	Gets the callback from Google and creates a Pin marker for each place.
 	*/
@@ -177,8 +166,6 @@ function neighborhoodMapViewModel() {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 			// bounds = new google.maps.LatLngBounds();
 			results.forEach(function (place){
-				// place.marker = createMarker(place);
-				// createMarker(place);
 				var latitude = place.geometry.location.lat();
 				var longitude = place.geometry.location.lng();
 
@@ -186,29 +173,15 @@ function neighborhoodMapViewModel() {
 				// bounds.extend(new google.maps.LatLng(latitude,longitude));
 				// createMarker(place);
 				self.pins.push(pin);
-				// markersIdArray.push(place);
 
 			});
 			// map.fitBounds(bounds);
 		}
 	}
-
 	/*
 	Function to create a marker at each place.	This is called on load of the map with the pre-populated list, and also after each search.	Also sets the content of each place's infowindow.
 	*/
 	function createMarker(marker,place) {
-		// var latitude = place.geometry.location.lat();
-		// var longitude = place.geometry.location.lng();
-		// var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
-	// var marker = new google.maps.Marker({
-	// 	map: map,
-	// 	icon: 'img/red-dot.png',
-	// 	name: place.name,
-	// 	position: place.geometry.location,
-	// 	place_id: place.place_id,
-	// 	animation: google.maps.Animation.DROP
-	// });
-	// var marker = place.marker;
 	// var address;
 	// if (place.vicinity !== undefined) {
 	// 	address = place.vicinity;
@@ -224,9 +197,7 @@ function neighborhoodMapViewModel() {
 		marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){marker.setAnimation(null);}, 1450);
 	});
-	// return marker;
 	}
-
 	/*
 	Function that will pan to the position and open an info window of an item clicked in the list.
 	*/
@@ -234,36 +205,18 @@ function neighborhoodMapViewModel() {
 		// var marker;
 		// var numMarkers = markersIdArray.length;
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
-		console.log(pos);
-		// console.log(pin.name());
-
-		// marker = new google.maps.Marker({
-		// 	icon: 'img/red-dot.png',
-		// 	position: pos,
-		// 	place_id: pin.pid(),
-		// 	animation: google.maps.Animation.DROP
-		// });
-
-		// console.log(numMarkers);
-		// for(var i = 0; i < numMarkers; i++) {
-		// 	if(pin.place_id === markersIdArray[i].place_id) {
-		// 		marker = markersIdArray[i];
-		// 		break;
-		// 	}
-		// }
 	// self.getFoursquareInfo(place);
 	// self.getFoursquareInfo();
-
+		var marker = place.marker();
 		var contentString = '<div style="font-weight: bold">' + place.name() + '</div>';
 		infowindow.setContent(contentString);
-		infowindow.open(map, place.marker);
+		infowindow.open(map, marker);
 		map.panTo(pos);
+	marker.setAnimation(google.maps.Animation.BOUNCE);
+	setTimeout(function(){marker.setAnimation(null);}, 1450);
 	};
-
 
 	google.maps.event.addDomListener(window, 'load', initialize);
 }
 
-// $(function(){
 ko.applyBindings(new neighborhoodMapViewModel());
-// });
