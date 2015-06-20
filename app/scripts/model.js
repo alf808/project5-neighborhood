@@ -42,7 +42,7 @@ function neighborhoodMapViewModel() {
 			place_id: id,
 			animation: google.maps.Animation.DROP
 		});
-		this.marker = marker;
+		// this.marker = marker;
 		this.isVisible = ko.observable(false);
 
 		this.isVisible.subscribe(function(currentState) {
@@ -56,7 +56,7 @@ function neighborhoodMapViewModel() {
 		this.isVisible(true);
 
 		// var contentString = '<div style="font-weight: bold">' + name + '</div><br>' + self.foursquareInfo ;
-		createMarker(marker);
+		createMarker(marker,this);
 		// google.maps.event.addListener(marker, 'click', function() {
 		// 	self.clickMarker(this);
 		// 	// infowindow.setContent(contentString);
@@ -90,7 +90,7 @@ function neighborhoodMapViewModel() {
 	}
 
 	/*
-	Loads the map as well as position the search bar and list.	On a search, clearMarkers removes all markers already on the map and removes all info in allPlaces.	Then, once a search is complete, populates more markers and sends the info to getAllPlaces to populate allPlaces again. Zoom level 0-19; 0 for a planetary view and 19 to a very local view
+	Loads the map as well as position the search bar and list. On a search, clearMarkers removes all markers already on the map and removes all info in allPlaces. Then, once a search is complete, populates more markers and sends the info to getAllPlaces to populate allPlaces again. Zoom level 0-19; 0 for a planetary view and 19 to a very local view
 	*/
 	self.list = (document.getElementById('list'));
 	var input = (document.getElementById('pac-input'));
@@ -161,7 +161,7 @@ function neighborhoodMapViewModel() {
 	function getPlaces() {
 		var request1 = {
 			location: kapahulu,
-			radius: 600,
+			radius: 500,
 			types: ['restaurant', 'cafe', 'food'],
 		};
 
@@ -196,7 +196,7 @@ function neighborhoodMapViewModel() {
 	/*
 	Function to create a marker at each place.	This is called on load of the map with the pre-populated list, and also after each search.	Also sets the content of each place's infowindow.
 	*/
-	function createMarker(marker) {
+	function createMarker(marker,place) {
 		// var latitude = place.geometry.location.lat();
 		// var longitude = place.geometry.location.lng();
 		// var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
@@ -215,7 +215,7 @@ function neighborhoodMapViewModel() {
 	// } else if (place.formatted_address !== undefined) {
 	// 	address = place.formatted_address;
 	// }
-	var contentString = '<div style="font-weight: bold">' + 'hello' + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
+	var contentString = '<div style="font-weight: bold">' + place.name() + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
 
 	google.maps.event.addListener(marker, 'click', function() {
 		infowindow.setContent(contentString);
@@ -254,7 +254,7 @@ function neighborhoodMapViewModel() {
 	// self.getFoursquareInfo(place);
 	// self.getFoursquareInfo();
 
-		var contentString = '<div style="font-weight: bold">' + 'hello' + '</div>';
+		var contentString = '<div style="font-weight: bold">' + place.name() + '</div>';
 		infowindow.setContent(contentString);
 		infowindow.open(map, place.marker);
 		map.panTo(pos);
