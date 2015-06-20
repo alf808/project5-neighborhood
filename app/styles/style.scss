@@ -22,7 +22,7 @@ body {
 div#list h2 {
 	text-align: center;
 	margin-top: .25em;
-	font-size: 2em;
+	font-size: 1.75em;
 }
 ul {
 	padding: 0;
@@ -86,7 +86,7 @@ text-align: center;
 	box-shadow: 0 2px .375em $black_30;
 }
 
-@media screen and(min-width: 640px) {
+@media screen and(min-width: 500px) {
 #list {
 	background-color: $bluish_white;
 	font-size: 1.25em;
@@ -101,7 +101,7 @@ text-align: center;
 }
 }
 
-@media screen and(max-width: 639px) {
+@media screen and(max-width: 499px) {
 #list { display: none; }
 }
 

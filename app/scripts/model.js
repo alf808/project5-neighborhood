@@ -1,16 +1,17 @@
 var map;
+var infowindow;
 
 function neighborhoodMapViewModel() {
 	var self = this;
 	var service;
-	var infowindow;
+
 	// kapahulu area's latitude and longitude
 	var lat = 21.2790587;
 	var lng = -157.81368810000004;
 	var kapahulu = new google.maps.LatLng(lat, lng);
 
 	// array to hold info for knockout
-	var markersIdArray = [];
+	// var markersIdArray = [];
 	self.pins = ko.observableArray([]);
 	// self.query = ko.observable('');
 
@@ -18,11 +19,11 @@ function neighborhoodMapViewModel() {
 	self.foursquareInfo = '';
 
 	// Finds the center of the map to get lat and lng values
-	function computeCenter() {
-		var latAndLng = map.getCenter();
-		lat = latAndLng.lat();
-		lng = latAndLng.lng();
-	}
+	// function computeCenter() {
+	// 	var latAndLng = map.getCenter();
+	// 	lat = latAndLng.lat();
+	// 	lng = latAndLng.lng();
+	// }
 	/**
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
@@ -33,7 +34,7 @@ function neighborhoodMapViewModel() {
 		this.lat  = ko.observable(lat);
 		this.lon  = ko.observable(lon);
 		this.text = ko.observable(text);
-		this.pid = ko.observable(id);
+		// this.pid = ko.observable(id);
 
 		marker = new google.maps.Marker({
 			icon: 'img/red-dot.png',
@@ -55,7 +56,7 @@ function neighborhoodMapViewModel() {
 
 		createMarker(marker,this);
 	};
-
+self.query = ko.observable('');
 	/**
 	* The CenterControl adds a control to the map that recenters the map on Neighborhood.
 	* This constructor takes the control DIV as an argument.
@@ -76,9 +77,10 @@ function neighborhoodMapViewModel() {
 		// Setup the click event listeners: simply reset the map to kapahulu
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
+			map.setZoom(16);
+		if (infowindow) infowindow.close();
+		self.query('');
 		});
-		// google.maps.InfoWindow.close();
-		// self.query(null);
 	}
 
 	/*
@@ -133,7 +135,7 @@ function neighborhoodMapViewModel() {
 	}
 
 	// This interfaces to bound values in view
-	self.query = ko.observable('');
+	// self.query = ko.observable('');
 	self.filterPins = ko.computed(function () {
 			var search  = self.query().toLowerCase();
 
@@ -191,11 +193,12 @@ function neighborhoodMapViewModel() {
 	var contentString = '<div style="font-weight: bold">' + place.name() + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
 
 	google.maps.event.addListener(marker, 'click', function() {
+		if (infowindow) infowindow.close();
 		infowindow.setContent(contentString);
 		infowindow.open(map, marker);
 		map.panTo(marker.position);
 		marker.setAnimation(google.maps.Animation.BOUNCE);
-		setTimeout(function(){marker.setAnimation(null);}, 1450);
+		setTimeout(function(){marker.setAnimation(null);}, 1000);
 	});
 	}
 	/*
@@ -213,7 +216,7 @@ function neighborhoodMapViewModel() {
 		infowindow.open(map, marker);
 		map.panTo(pos);
 	marker.setAnimation(google.maps.Animation.BOUNCE);
-	setTimeout(function(){marker.setAnimation(null);}, 1450);
+	setTimeout(function(){marker.setAnimation(null);}, 1000);
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
