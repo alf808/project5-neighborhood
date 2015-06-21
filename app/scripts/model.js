@@ -18,12 +18,6 @@ function neighborhoodMapViewModel() {
 	// string to hold foursquare information
 	self.foursquareInfo = '';
 
-	// Finds the center of the map to get lat and lng values
-	// function computeCenter() {
-	// 	var latAndLng = map.getCenter();
-	// 	lat = latAndLng.lat();
-	// 	lng = latAndLng.lng();
-	// }
 	/**
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
@@ -55,51 +49,31 @@ function neighborhoodMapViewModel() {
 		this.isVisible(true);
 
 		createMarker(marker,id,this);
-
+		// Asynchronous fetching of 4square vicinity venues. First item will be fethched
 		this.getFoursquareInfo = asyncComputed(function() {
-			// creates our foursquare URL
-
 			var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
-
 			return $.getJSON(foursquareURL, {
 				format: "json", limit: 1
 			});
 		}, this);
-
-
-		// this.fsqid = this.getFoursquareInfo.response.venues[0].id;
 	};
-
 	/**
-	* This should asynchronously fetch json from 4square
+	* This should help asynchronously execute functions. It will be used to fetch
+	* some json objects. Code based on URL below
 	* https://github.com/knockout/knockout/wiki/Asynchronous-Dependent-Observables
 	*/
 	function asyncComputed(evaluator, owner) {
 		var result = ko.observable();
 
 		ko.computed(function() {
-			// Get the $.Deferred value, and then set up a callback so that when it's done,
-			// the output is transferred onto our "result" observable
+			// Get the $.Deferred value, and then set up a callback
 			evaluator.call(owner).done(result);
 		});
-
 		return result;
 	}
-
-	// this.getFoursquareInfo = asyncComputed(function() {
-	// 	// creats our foursquare URL
-	//
-	// 	var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lng+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
-	//
-	// 	return $.getJSON(foursquareURL, {
-	// 		format: "json"
-	// 	});
-	// }, this);
-
 	/**
 	* The CenterControl adds a control to the map that recenters the map on Neighborhood.
 	* This constructor takes the control DIV as an argument.
-	* constructor
 	*/
 	function CenterControl(controlDiv, map) {
 
@@ -113,7 +87,7 @@ function neighborhoodMapViewModel() {
 		controlText.innerHTML = 'Reset Kapahulu Map';
 		controlUI.appendChild(controlText);
 
-		// Setup the click event listeners: simply reset the map to kapahulu
+		// Setup the click event listener to simply reset the map to kapahulu
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
 			map.setZoom(16);
@@ -151,7 +125,6 @@ function neighborhoodMapViewModel() {
 		map = new google.maps.Map(mapDiv, mapOptions);
 		service = new google.maps.places.PlacesService(map);
 		getPlaces();
-		// self.getFoursquareInfo();
 		// Create the DIV to hold the control and call the CenterControl() constructor
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(self.list);
 
@@ -168,14 +141,11 @@ function neighborhoodMapViewModel() {
 			window.clearTimeout(timer);
 		});
 	}
-
 	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
 		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
 	}
-
-	// This interfaces to bound values in view
-	// self.query = ko.observable('');
+	// This interfaces to bound pin markers in view
 	self.filterPins = ko.computed(function () {
 			var search  = self.query().toLowerCase();
 
@@ -188,18 +158,17 @@ function neighborhoodMapViewModel() {
 			});
 	});
 	/*
-	Function to pre-populate the map with place types. nearbySearch retuns up to 20 places.
+	Function to pre-populate the map -- nearbySearch retuns up to 20 places.
 	*/
 	function getPlaces() {
-		var request1 = {
+		var request = {
 			location: kapahulu,
 			radius: 500,
 			types: ['restaurant', 'cafe', 'food'],
 		};
 
 		infowindow = new google.maps.InfoWindow();
-		// service = new google.maps.places.PlacesService(map);
-		service.nearbySearch(request1, callback);
+		service.nearbySearch(request, callback);
 	}
 	/*
 	Gets the callback from Google and creates a Pin marker for each place.
@@ -217,11 +186,9 @@ function neighborhoodMapViewModel() {
 			});
 
 			// console.log(results);
-
 			// map.fitBounds(bounds);
 		}
 	}
-
 	/*
 	Function to create a marker at each place. This is called on load of the map with the pre-populated list, and also after each search. Also sets the content of each place's infowindow.
 	*/
@@ -236,8 +203,6 @@ function neighborhoodMapViewModel() {
 
 	var contentString = place.name();
 
-	// console.log(service.getDetails(id));
-
 	google.maps.event.addListener(marker, 'click', function() {
 		if (infowindow) infowindow.close();
 		infowindow.setContent(contentString);
@@ -251,36 +216,25 @@ function neighborhoodMapViewModel() {
 	Function that will pan to the position and open an info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
-		// var marker;
-		// var numMarkers = markersIdArray.length;
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		var getFoursquareInfoDetail;
-	// self.getFoursquareInfo(place);
-	// self.getFoursquareInfo();
 		var marker = place.marker();
 		var contentString = '<div style="font-weight: bold">' + place.name() + '</div>';
 		infowindow.setContent(contentString);
 		infowindow.open(map, marker);
 		map.panTo(pos);
-	marker.setAnimation(google.maps.Animation.BOUNCE);
-	setTimeout(function(){marker.setAnimation(null);}, 1000);
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function(){marker.setAnimation(null);}, 1000);
 
-	// console.log(place.getFoursquareInfo().response.venues[0].id);
-	var tempid = place.getFoursquareInfo().response.venues[0].id;
+		var tempid = place.getFoursquareInfo().response.venues[0].id;
 
-		// creates our foursquare URL
-
-	var foursquareURL = 'http://api.foursquare.com/v2/venues/' +tempid+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
-
-	$.getJSON(foursquareURL, function(data) {
-		var detail = data.response.venue;
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' +tempid+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+		$.getJSON(foursquareURL, function(data) {
+			var detail = data.response.venue;
 			console.log('yeah '+ detail.name);
 		}).error(function(e){
-        console.log('oops');
-    });
-
-
-	// console.log(place.fsqid());
+			console.log('oops');
+		});
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
