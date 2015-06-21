@@ -66,7 +66,7 @@ function neighborhoodMapViewModel() {
 			});
 		}, this);
 
-		this.fsqid = this.getFoursquareInfo.response.venues[0].id;
+		// this.fsqid = this.getFoursquareInfo.response.venues[0].id;
 	};
 
 	/**
@@ -213,44 +213,13 @@ function neighborhoodMapViewModel() {
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 				// bounds.extend(new google.maps.LatLng(latitude,longitude));
 				self.pins.push(pin);
-				// getPlaceDetailInfo(place.place_id);
-				// var placedetailURL = 'https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU';
-				//
-				// $.getJSON(placedetailURL, {
-				// 	placeid: place.place_id
-				// });
 			});
 
 			// console.log(results);
-			// console.log(https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU&placeid=ChIJSanEMX9yAHwRYb7nn-OlbbU);
+
 			// map.fitBounds(bounds);
 		}
 	}
-	/**
-	* This should asynchronously fetch json from place details
-	* https://github.com/knockout/knockout/wiki/Asynchronous-Dependent-Observables
-	*/
-	// function asyncComputed(evaluator, owner) {
-	// 	var result = ko.observable();
-	//
-	// 	ko.computed(function() {
-	// 		// Get the $.Deferred value, and then set up a callback so that when it's done,
-	// 		// the output is transferred onto our "result" observable
-	// 		evaluator.call(owner).done(result);
-	// 	});
-	//
-	// 	return result;
-	// }
-	//
-	// this.getPlaceDetailInfo = asyncComputed(function() {
-	// 	// creates our foursquare URL
-	//
-	// 	var placedetailURL = 'https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU';
-	//
-	// 	return $.getJSON(placedetailURL, {
-	// 		placeid: "ChIJSanEMX9yAHwRYb7nn-OlbbU"
-	// 	});
-	// }, this);
 
 	/*
 	Function to create a marker at each place. This is called on load of the map with the pre-populated list, and also after each search. Also sets the content of each place's infowindow.
@@ -294,7 +263,7 @@ function neighborhoodMapViewModel() {
 	marker.setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){marker.setAnimation(null);}, 1000);
 
-	console.log(place.fsqid());
+	console.log(place.getFoursquareInfo().response.venues[0].id);
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
