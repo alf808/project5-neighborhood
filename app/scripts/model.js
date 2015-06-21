@@ -66,6 +66,7 @@ function neighborhoodMapViewModel() {
 			});
 		}, this);
 
+
 		// this.fsqid = this.getFoursquareInfo.response.venues[0].id;
 	};
 
@@ -253,6 +254,7 @@ function neighborhoodMapViewModel() {
 		// var marker;
 		// var numMarkers = markersIdArray.length;
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
+		var getFoursquareInfoDetail;
 	// self.getFoursquareInfo(place);
 	// self.getFoursquareInfo();
 		var marker = place.marker();
@@ -263,7 +265,22 @@ function neighborhoodMapViewModel() {
 	marker.setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){marker.setAnimation(null);}, 1000);
 
-	console.log(place.getFoursquareInfo().response.venues[0].id);
+	// console.log(place.getFoursquareInfo().response.venues[0].id);
+	var tempid = place.getFoursquareInfo().response.venues[0].id;
+
+		// creates our foursquare URL
+
+	var foursquareURL = 'http://api.foursquare.com/v2/venues/' +tempid+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+
+	$.getJSON(foursquareURL, function(data) {
+		var detail = data.response.venue;
+			console.log('yeah '+ detail.name);
+		}).error(function(e){
+        console.log('oops');
+    });
+
+
+	// console.log(place.fsqid());
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
