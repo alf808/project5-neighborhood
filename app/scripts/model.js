@@ -34,7 +34,7 @@ function neighborhoodMapViewModel() {
 		this.lat  = ko.observable(lat);
 		this.lon  = ko.observable(lon);
 		this.text = ko.observable(text);
-		// this.pid = ko.observable(id);
+		this.fsqid = ko.observable('');
 
 		marker = new google.maps.Marker({
 			icon: 'img/red-dot.png',
@@ -54,9 +54,47 @@ function neighborhoodMapViewModel() {
 		});
 		this.isVisible(true);
 
-		createMarker(marker,this);
+		createMarker(marker,id,this);
+
+		this.getFoursquareInfo = asyncComputed(function() {
+			// creates our foursquare URL
+
+			var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+
+			return $.getJSON(foursquareURL, {
+				format: "json", limit: 1
+			});
+		}, this);
+
+		this.fsqid = this.getFoursquareInfo.response.venues[0].id;
 	};
-// self.query = ko.observable('');
+
+	/**
+	* This should asynchronously fetch json from 4square
+	* https://github.com/knockout/knockout/wiki/Asynchronous-Dependent-Observables
+	*/
+	function asyncComputed(evaluator, owner) {
+		var result = ko.observable();
+
+		ko.computed(function() {
+			// Get the $.Deferred value, and then set up a callback so that when it's done,
+			// the output is transferred onto our "result" observable
+			evaluator.call(owner).done(result);
+		});
+
+		return result;
+	}
+
+	// this.getFoursquareInfo = asyncComputed(function() {
+	// 	// creats our foursquare URL
+	//
+	// 	var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lng+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+	//
+	// 	return $.getJSON(foursquareURL, {
+	// 		format: "json"
+	// 	});
+	// }, this);
+
 	/**
 	* The CenterControl adds a control to the map that recenters the map on Neighborhood.
 	* This constructor takes the control DIV as an argument.
@@ -78,8 +116,8 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addDomListener(controlUI, 'click', function() {
 			map.setCenter(kapahulu);
 			map.setZoom(16);
-		if (infowindow) infowindow.close();
-		self.query('');
+			if (infowindow) infowindow.close();
+			self.query('');
 		});
 	}
 
@@ -110,6 +148,7 @@ function neighborhoodMapViewModel() {
 	function initialize() {
 
 		map = new google.maps.Map(mapDiv, mapOptions);
+		service = new google.maps.places.PlacesService(map);
 		getPlaces();
 		// self.getFoursquareInfo();
 		// Create the DIV to hold the control and call the CenterControl() constructor
@@ -158,7 +197,7 @@ function neighborhoodMapViewModel() {
 		};
 
 		infowindow = new google.maps.InfoWindow();
-		service = new google.maps.places.PlacesService(map);
+		// service = new google.maps.places.PlacesService(map);
 		service.nearbySearch(request1, callback);
 	}
 	/*
@@ -173,24 +212,61 @@ function neighborhoodMapViewModel() {
 
 				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
 				// bounds.extend(new google.maps.LatLng(latitude,longitude));
-				// createMarker(place);
 				self.pins.push(pin);
-
+				// getPlaceDetailInfo(place.place_id);
+				// var placedetailURL = 'https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU';
+				//
+				// $.getJSON(placedetailURL, {
+				// 	placeid: place.place_id
+				// });
 			});
+
+			// console.log(results);
+			// console.log(https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU&placeid=ChIJSanEMX9yAHwRYb7nn-OlbbU);
 			// map.fitBounds(bounds);
 		}
 	}
-	/*
-	Function to create a marker at each place.	This is called on load of the map with the pre-populated list, and also after each search.	Also sets the content of each place's infowindow.
+	/**
+	* This should asynchronously fetch json from place details
+	* https://github.com/knockout/knockout/wiki/Asynchronous-Dependent-Observables
 	*/
-	function createMarker(marker,place) {
+	// function asyncComputed(evaluator, owner) {
+	// 	var result = ko.observable();
+	//
+	// 	ko.computed(function() {
+	// 		// Get the $.Deferred value, and then set up a callback so that when it's done,
+	// 		// the output is transferred onto our "result" observable
+	// 		evaluator.call(owner).done(result);
+	// 	});
+	//
+	// 	return result;
+	// }
+	//
+	// this.getPlaceDetailInfo = asyncComputed(function() {
+	// 	// creates our foursquare URL
+	//
+	// 	var placedetailURL = 'https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCFkiiOKNiYCRYcVvH1pyINXrQ7dE6gmnU';
+	//
+	// 	return $.getJSON(placedetailURL, {
+	// 		placeid: "ChIJSanEMX9yAHwRYb7nn-OlbbU"
+	// 	});
+	// }, this);
+
+	/*
+	Function to create a marker at each place. This is called on load of the map with the pre-populated list, and also after each search. Also sets the content of each place's infowindow.
+	*/
+	function createMarker(marker,id,place) {
 	// var address;
 	// if (place.vicinity !== undefined) {
 	// 	address = place.vicinity;
 	// } else if (place.formatted_address !== undefined) {
 	// 	address = place.formatted_address;
 	// }
-	var contentString = '<div style="font-weight: bold">' + place.name() + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
+	// var contentString = '<div style="font-weight: bold">' + place.name() + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
+
+	var contentString = place.name();
+
+	// console.log(service.getDetails(id));
 
 	google.maps.event.addListener(marker, 'click', function() {
 		if (infowindow) infowindow.close();
@@ -217,6 +293,8 @@ function neighborhoodMapViewModel() {
 		map.panTo(pos);
 	marker.setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){marker.setAnimation(null);}, 1000);
+
+	console.log(place.fsqid());
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
