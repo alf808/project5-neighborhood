@@ -20,10 +20,8 @@
 		<div class="row">
 			<!-- map here -->
 			<div class="col-xs-12 map">
-
-				<!-- input id="pac-input" class="controls" type="text"
-				placeholder="If you want more info... " data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off" -->
-				<input id="pac-input" class="controls" type="text" placeholder="If you want more info... " data-bind="textInput: query" autocomplete="on">
+<!-- pre data-bind="text: filterPins"></pre -->
+				<input id="pac-input" class="controls" type="text" placeholder="If you want more info... " data-bind="textInput: query">
 				<div id="map-canvas"></div>
 
 				<!-- list here -->
@@ -45,6 +43,7 @@
 			<!-- /.container -->
 
 			<script src="libs/knockout.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js"></script>
 			<script src="libs/jquery.min.js"></script>
 			<script src="libs/bootstrap.min.js"></script>
 
