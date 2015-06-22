@@ -1,14 +1,15 @@
 var map;
 var infowindow;
+// var debugbindings;
 
 function neighborhoodMapViewModel() {
 	var self = this;
 	var service;
 
 	// kapahulu area's latitude and longitude
-	var lat = 21.2790587;
-	var lng = -157.81368810000004;
-	var kapahulu = new google.maps.LatLng(lat, lng);
+	var latitude = 21.2790587;
+	var longitude = -157.81368810000004;
+	var kapahulu = new google.maps.LatLng(latitude, longitude);
 
 	// array to hold info for knockout
 	// var markersIdArray = [];
@@ -21,20 +22,38 @@ function neighborhoodMapViewModel() {
 	/**
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
-	var Pin = function Pin(map, name, lat, lon, id, text) {
-		var marker;
+	var Pin = function Pin(map, name, lat, lon, id) {
+		var marker, jqxhr1;
+		var xhrfsqid;
+
+		// Asynchronous fetching of 4square vicinity venues. First item will be fetched
+			var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+			jqxhr1 = $.getJSON(foursquareURL, {
+				format: "json", limit: 1
+			}).error(function(e){
+				console.log('oops');
+			}).done(function(data){
+				var detail = data.response;
+				xhrfsqid = detail.venues[0].id;
+				console.log(xhrfsqid);
+			});
+			// this.fsqid = xhrfsqid;
+			// Set another completion function for the request above
+			jqxhr1.complete(function() {
+			  console.log( "second complete" + xhrfsqid);
+			});
 
 		this.name = ko.observable(name);
 		this.lat  = ko.observable(lat);
 		this.lon  = ko.observable(lon);
-		this.text = ko.observable(text);
-		this.fsqid = ko.observable('');
+		// this.text = ko.observable(text);
+		this.fsqid = ko.observable(xhrfsqid);
 
 		marker = new google.maps.Marker({
 			icon: 'img/red-dot.png',
 			position: new google.maps.LatLng(lat, lon),
-			place_id: id,
-			animation: google.maps.Animation.DROP
+			place_id: id
+			// animation: google.maps.Animation.DROP
 		});
 		this.marker = ko.observable(marker);
 		this.isVisible = ko.observable(false);
@@ -48,14 +67,19 @@ function neighborhoodMapViewModel() {
 		});
 		this.isVisible(true);
 
-		createMarker(marker,id,this);
-		// Asynchronous fetching of 4square vicinity venues. First item will be fethched
-		this.getFoursquareInfo = asyncComputed(function() {
-			var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
-			return $.getJSON(foursquareURL, {
-				format: "json", limit: 1
-			});
-		}, this);
+		// createMarker(marker,id,this);
+
+		var contentString = 'gname';
+
+		google.maps.event.addListener(marker, 'click', function() {
+			if (infowindow) infowindow.close();
+			infowindow.setContent(contentString);
+			infowindow.open(map, marker);
+			map.panTo(marker.position);
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function(){marker.setAnimation(null);}, 1000);
+		});
+
 	};
 	/**
 	* This should help asynchronously execute functions. It will be used to fetch
@@ -140,6 +164,8 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addListener(map, 'tilesloaded', function() {
 			window.clearTimeout(timer);
 		});
+
+
 	}
 	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
@@ -177,12 +203,15 @@ function neighborhoodMapViewModel() {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 			// bounds = new google.maps.LatLngBounds();
 			results.forEach(function (place){
-				var latitude = place.geometry.location.lat();
-				var longitude = place.geometry.location.lng();
-
-				var pin = new Pin(map, place.name, latitude, longitude, place.place_id, place.text);
+				var lat = place.geometry.location.lat();
+				var lng = place.geometry.location.lng();
+				gresult = ko.mapping.fromJSON(place);
+				var pin = new Pin(map, place.name, lat, lng, place.place_id);
 				// bounds.extend(new google.maps.LatLng(latitude,longitude));
+				// var gresult = {};
 				self.pins.push(pin);
+
+				// console.log(gresult);
 			});
 
 			// console.log(results);
@@ -192,7 +221,7 @@ function neighborhoodMapViewModel() {
 	/*
 	Function to create a marker at each place. This is called on load of the map with the pre-populated list, and also after each search. Also sets the content of each place's infowindow.
 	*/
-	function createMarker(marker,id,place) {
+	// function createMarker(marker,id,place) {
 	// var address;
 	// if (place.vicinity !== undefined) {
 	// 	address = place.vicinity;
@@ -201,17 +230,32 @@ function neighborhoodMapViewModel() {
 	// }
 	// var contentString = '<div style="font-weight: bold">' + place.name() + '</div><br>' + 'address' + '<br>' + self.foursquareInfo ;
 
-	var contentString = place.name();
+	// var contentString = place.name();
+	//
+	// google.maps.event.addListener(marker, 'click', function() {
+	// 	if (infowindow) infowindow.close();
+	// 	infowindow.setContent(contentString);
+	// 	infowindow.open(map, marker);
+	// 	map.panTo(marker.position);
+	// 	marker.setAnimation(google.maps.Animation.BOUNCE);
+	// 	setTimeout(function(){marker.setAnimation(null);}, 1000);
+	// });
+	// }
 
-	google.maps.event.addListener(marker, 'click', function() {
-		if (infowindow) infowindow.close();
-		infowindow.setContent(contentString);
-		infowindow.open(map, marker);
-		map.panTo(marker.position);
-		marker.setAnimation(google.maps.Animation.BOUNCE);
-		setTimeout(function(){marker.setAnimation(null);}, 1000);
-	});
-	}
+	// this.getFoursquareInfoDetail = function(id) {
+	// 	var foursquareURL = 'http://api.foursquare.com/v2/venues/' +id+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+	//
+	// 	$.getJSON(foursquareURL, function(data) {
+	// 		var detail = data.response.venue;
+	// 		self.foursquareInfo = '<p>'+detail.name+'</p>';
+	// 		// debugbindings = ko.mapping.fromJS(data);
+	// 		console.log('yeah '+ detail.name);
+	// 		// console.log(debugbindings);
+	// 	}).error(function(e){
+	// 		console.log('oops');
+	// 	});
+	//
+	// };
 	/*
 	Function that will pan to the position and open an info window of an item clicked in the list.
 	*/
@@ -219,19 +263,23 @@ function neighborhoodMapViewModel() {
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		var getFoursquareInfoDetail;
 		var marker = place.marker();
-		var contentString = '<div style="font-weight: bold">' + place.name() + '</div>';
+
+		var tempid = place.fsqid();
+		// self.getFoursquareInfoDetail(tempid);
+
+		var contentString = '<div style="font-weight: bold">' + place.fsqid() + '</div>' + self.foursquareInfo;
 		infowindow.setContent(contentString);
 		infowindow.open(map, marker);
 		map.panTo(pos);
 		marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){marker.setAnimation(null);}, 1000);
 
-		var tempid = place.getFoursquareInfo().response.venues[0].id;
-
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' +tempid+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' +place.lat()+  '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
 		$.getJSON(foursquareURL, function(data) {
 			var detail = data.response.venue;
+			// debugbindings = ko.mapping.fromJS(data);
 			console.log('yeah '+ detail.name);
+			// console.log(debugbindings);
 		}).error(function(e){
 			console.log('oops');
 		});
