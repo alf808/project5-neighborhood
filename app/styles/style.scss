@@ -53,6 +53,33 @@ hr {
 //	height:calc(100% - 0px);
 }
 
+.googleinfowindow {
+	p {
+		max-width:220px;
+	}
+	.review {
+		position:relative;
+		border-top:1px solid #ccc;
+		padding-top:10px;
+		img {
+			float:left;
+			display:inline-block;
+			max-width:50px;
+			margin-right:10px;
+			border-radius:5px;
+		}
+		&:after {
+			content:"info from FourSquare";
+			display:inline-block;
+			font-size:10px;
+			color:$color_cornflower_blue_approx;
+			float:right;
+			margin-top:10px;
+		}
+	}
+}
+
+
 .reset-button {
 	background-color: $yellow;
 border: 2px solid #fff;
