@@ -191,32 +191,37 @@ function neighborhoodMapViewModel() {
 			// map.fitBounds(bounds);
 		}
 	}
-	/*
-	Function that will pan to the position and open an info window of an item clicked in the list.
-	*/
-	self.clickMarker = function(place) {
-		var pos = new google.maps.LatLng(place.lat(), place.lon());
-		var getFoursquareInfoDetail;
-		var marker = place.marker();
 
-		var googleinfowintext = place.googlename();
-		var infowindowDiv = document.createElement('div');
-		infowindowDiv.innerHTML = googleinfowintext + 'hi';
-		// container.appendChild(infowindowDiv);
-
-		googleinfowin.setContent(infowindowDiv);
-		googleinfowin.open(map, marker);
-		map.panTo(pos);
-		marker.setAnimation(google.maps.Animation.BOUNCE);
-		setTimeout(function(){marker.setAnimation(null);}, 1000);
-
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +place.lat()+ ',' +place.lon()+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+	self.getFoursquareInfo = function(lat, lon) {
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
 		$.getJSON(foursquareURL, function(data) {
-			// var detail = data.response.venue;
+			self.foursquareInfo = 'yeah '+data.response.venues[0].name;
 			console.log('yeah '+data.response.venues[0].id);
 		}).error(function(e){
 			console.log('oops');
 		});
+	};
+	/*
+	Function that will open info window of an item clicked in the list.
+	*/
+	self.clickMarker = function(place) {
+		self.getFoursquareInfo(place.lat(), place.lon());
+		var pos = new google.maps.LatLng(place.lat(), place.lon());
+		// var getFoursquareInfoDetail;
+		var marker = place.marker();
+
+		map.panTo(pos);
+		// wait for a few milliseconds to get info from foursquare
+		setTimeout(function() {
+			var googleinfowintext = place.googlename() +'<br>'+ self.foursquareInfo;
+			var infowindowDiv = document.createElement('div');
+			infowindowDiv.innerHTML = googleinfowintext;
+			googleinfowin.setContent(infowindowDiv);
+			googleinfowin.open(map, marker);
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function(){marker.setAnimation(null);}, 1000);
+		}, 400);
+
 	};
 
 	google.maps.event.addDomListener(window, 'load', initialize);
