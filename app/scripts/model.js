@@ -53,15 +53,15 @@ function neighborhoodMapViewModel() {
 		// 	getFoursquareInfo(lat, lon);
 	  // }, this);
 		// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
-		// google.maps.event.addListener(marker, 'click', function() {
-		// 	var googleinfowintext = '<br>' + this.gfi();
-		// 	if (googleinfowin) googleinfowin.close();
-		// 	googleinfowin.setContent(googleinfowintext);
-		// 	googleinfowin.open(map, marker);
-		// 	map.panTo(marker.position);
-		// 	marker.setAnimation(google.maps.Animation.BOUNCE);
-		// 	setTimeout(function(){marker.setAnimation(null);}, 1000);
-		// });
+		google.maps.event.addListener(marker, 'click', function() {
+			var googleinfowintext = gname;
+			if (googleinfowin) googleinfowin.close();
+			googleinfowin.setContent(googleinfowintext);
+			googleinfowin.open(map, marker);
+			map.panTo(marker.position);
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+			setTimeout(function(){marker.setAnimation(null);}, 1000);
+		});
 	};
 	/**
 	* This should help asynchronously execute functions. It will be used to fetch
@@ -109,9 +109,7 @@ function neighborhoodMapViewModel() {
 
 	var mapDiv = document.getElementById('map-canvas');
 	var mapOptions = {
-		zoom: 16,
-		maxZoom: 18,
-		minZoom: 10,
+		zoom: 16, maxZoom: 16, minZoom: 10,
 		center: kapahulu,
 		disableDefaultUI: true,
 		zoomControl: true,
@@ -177,20 +175,23 @@ function neighborhoodMapViewModel() {
 	/*
 	Gets the callback from Google and creates a Pin marker for each place.
 	*/
-	function callback(results, status) {
+	function callback(results1, status) {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			// bounds = new google.maps.LatLngBounds();
+			results = results1.slice(0,16);
+			var bounds = window.mapBounds;
 			results.forEach(function (place){
 				var lat = place.geometry.location.lat();
 				var lon = place.geometry.location.lng();
-				var marker = getFoursquareInfo(lat, lon);
+				// var marker = getFoursquareInfo(lat, lon);
 				var pin = new Pin(map, place.name, lat, lon, place.place_id);
-				// bounds.extend(new google.maps.LatLng(latitude,longitude));
-				getFoursquareIdList(lat, lon);
+				bounds.extend(new google.maps.LatLng(latitude,longitude));
+				// getFoursquareIdList(lat, lon);
 				self.pins.push(pin);
 			});
-			console.log(self.fsidArray);
-			// map.fitBounds(bounds);
+			// BELOW UNDEFINED. PUSHING IN getFoursquareIdList NOT WORKING
+			// console.log(self.fsidArray);
+			map.fitBounds(bounds);
+			map.setCenter(bounds.getCenter());
 		}
 	}
 // I AM ATTEMPTING TO STORE A LIST OF VENUE ID SO THAT I CAN STORE AND MAKE ASYNC REQUESTS MORE EFFICIENTLY
@@ -209,7 +210,7 @@ function neighborhoodMapViewModel() {
 	function getFoursquareInfo(lat, lon) {
 		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
 		$.getJSON(foursquareURL, function(data) {
-			console.log('yeah '+data.response.venues[0].id);
+			console.log('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
 			self.foursquareInfo = data.response.venues[0].name;
 			// self.fsidArray.push(fsqid);
 		}).error(function(e){
@@ -220,16 +221,16 @@ function neighborhoodMapViewModel() {
 	Function that will open info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
-		// var gfi = getFoursquareInfo(place.lat(), place.lon());
+		getFoursquareInfo(place.lat(), place.lon());
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		// var getFoursquareInfoDetail;
 		var marker = place.marker();
-		var googleinfowintext = place.googlename() +'<br>'+ self.foursquareInfo;
 
 		map.panTo(pos);
+		if (googleinfowin) googleinfowin.close();
 		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
-			if (googleinfowin) googleinfowin.close();
+			var googleinfowintext = place.googlename() +'<br>4sq: '+ self.foursquareInfo;
 			var infowindowDiv = document.createElement('div');
 			infowindowDiv.innerHTML = googleinfowintext;
 			googleinfowin.setContent(infowindowDiv);
@@ -239,8 +240,13 @@ function neighborhoodMapViewModel() {
 		}, 500);
 
 	};
-
 	google.maps.event.addDomListener(window, 'load', initialize);
+	window.mapBounds = new google.maps.LatLngBounds();
+	// map.setZoom(16);
+	window.addEventListener('resize', function(e) {
+		map.fitBounds(mapBounds);
+		// map.setCenter(kapahulu);
+	});
 }
 
 ko.applyBindings(new neighborhoodMapViewModel());
