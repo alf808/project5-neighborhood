@@ -52,7 +52,7 @@ function neighborhoodMapViewModel() {
 		// this.gfi = ko.computed(function() {
 		// 	getFoursquareInfo(lat, lon);
 	  // }, this);
-
+		// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
 		// google.maps.event.addListener(marker, 'click', function() {
 		// 	var googleinfowintext = '<br>' + this.gfi();
 		// 	if (googleinfowin) googleinfowin.close();
@@ -62,7 +62,6 @@ function neighborhoodMapViewModel() {
 		// 	marker.setAnimation(google.maps.Animation.BOUNCE);
 		// 	setTimeout(function(){marker.setAnimation(null);}, 1000);
 		// });
-		// this.testfunction: function {console.log('hello');}
 	};
 	/**
 	* This should help asynchronously execute functions. It will be used to fetch
@@ -144,7 +143,6 @@ function neighborhoodMapViewModel() {
 		var timer = window.setTimeout(failedToLoad, 8000);
 		google.maps.event.addListener(map, 'tilesloaded', function() {
 			window.clearTimeout(timer);
-			// googleinfowin.close();
 		});
 		google.maps.event.addListener(map, 'click', function() {
 			googleinfowin.close();
@@ -195,7 +193,7 @@ function neighborhoodMapViewModel() {
 			// map.fitBounds(bounds);
 		}
 	}
-
+// I AM ATTEMPTING TO STORE A LIST OF VENUE ID SO THAT I CAN STORE AND MAKE ASYNC REQUESTS MORE EFFICIENTLY
 	function getFoursquareIdList(lat, lon) {
 		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
 		$.getJSON(foursquareURL, function(data) {
@@ -206,7 +204,8 @@ function neighborhoodMapViewModel() {
 			console.log('oops');
 		});
 	}
-
+// THIS IS ESSENTIALLY SAME CODE AS ABOVE FOR TESTING PURPOSES. THE URL IS ACTUALLY DIFFERENT TO GRAB
+// SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
 	function getFoursquareInfo(lat, lon) {
 		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
 		$.getJSON(foursquareURL, function(data) {
@@ -217,7 +216,6 @@ function neighborhoodMapViewModel() {
 			console.log('oops');
 		});
 	}
-
 	/*
 	Function that will open info window of an item clicked in the list.
 	*/
@@ -229,7 +227,7 @@ function neighborhoodMapViewModel() {
 		var googleinfowintext = place.googlename() +'<br>'+ self.foursquareInfo;
 
 		map.panTo(pos);
-		// wait for a few milliseconds to get info from foursquare
+		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
 			if (googleinfowin) googleinfowin.close();
 			var infowindowDiv = document.createElement('div');
