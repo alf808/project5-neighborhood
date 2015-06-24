@@ -196,7 +196,7 @@ function neighborhoodMapViewModel() {
 	}
 // I AM ATTEMPTING TO STORE A LIST OF VENUE ID SO THAT I CAN STORE AND MAKE ASYNC REQUESTS MORE EFFICIENTLY
 	function getFoursquareIdList(lat, lon) {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
 		$.getJSON(foursquareURL, function(data) {
 			// console.log('yeah '+data.response.venues[0].name);
 			var fsqid = data.response.venues[0].id;
@@ -208,7 +208,7 @@ function neighborhoodMapViewModel() {
 // THIS IS ESSENTIALLY SAME CODE AS ABOVE FOR TESTING PURPOSES. THE URL IS ACTUALLY DIFFERENT TO GRAB
 // SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
 	function getFoursquareInfo(lat, lon) {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare';
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
 		$.getJSON(foursquareURL, function(data) {
 			console.log('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
 			self.foursquareInfo = data.response.venues[0].name;
