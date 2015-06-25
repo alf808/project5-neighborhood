@@ -1,11 +1,65 @@
 var map;
-// var foursquareInfo;
 var fsidArray = [];
+var googleinfowin;
+
+var Pin = function(map, gname, lat, lon, id, idx) {
+	var self = this;
+	var marker;
+	// self.getFoursquareInfo(lat, lon);
+	self.fsqid = ko.observable('');
+	self.googlename = ko.observable(gname);
+	self.lat  = ko.observable(lat);
+	self.lon  = ko.observable(lon);
+	self.fsqArrayPos = ko.observable(idx);
+
+	marker = new google.maps.Marker({
+		icon: 'img/red-dot.png',
+		position: new google.maps.LatLng(lat, lon),
+		place_id: id
+	});
+	self.marker = ko.observable(marker);
+	self.isVisible = ko.observable(false);
+
+	self.isVisible.subscribe(function(currentState) {
+		if (currentState) {
+			marker.setMap(map);
+		} else {
+			marker.setMap(null);
+		}
+	});
+	self.isVisible(true);
+	// createMarker
+	//
+	(function() {
+	  var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
+	  $.getJSON(foursquareURL, function(data) {
+	    callbackFunction(data);
+	  }).error(function(e){
+	    console.log('oops');
+	  });
+	})();
+
+	function callbackFunction(data) {
+	    // console.log('yeah '+data.response.venues[0].name);
+	    fsidArray.push(data.response.venues[0].id);
+	    // self.fsqid = data.response.venues[0].id;
+	}
+
+	// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
+	google.maps.event.addListener(marker, 'click', function() {
+		var googleinfowintext = self.googlename();
+		if (googleinfowin) googleinfowin.close();
+		googleinfowin.setContent(googleinfowintext);
+		googleinfowin.open(map, marker);
+		map.panTo(marker.position);
+		marker.setAnimation(google.maps.Animation.BOUNCE);
+		setTimeout(function(){marker.setAnimation(null);}, 1000);
+	});
+};
 
 function neighborhoodMapViewModel() {
 	var self = this;
 	var service;
-	var googleinfowin;
 
 	// kapahulu area's latitude and longitude
 	var latitude = 21.2790587;
@@ -14,7 +68,6 @@ function neighborhoodMapViewModel() {
 
 	// array to hold info for knockout
 	self.pins = ko.observableArray([]);
-	// self.fsidArray = [];
 	self.query = ko.observable('');
 	// self.googleinfowintext = '';
 
@@ -23,46 +76,6 @@ function neighborhoodMapViewModel() {
 	/**
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
-	var Pin = function(map, gname, lat, lon, id) {
-		var marker;
-		// self.getFoursquareInfo(lat, lon);
-
-		this.googlename = ko.observable(gname);
-		this.lat  = ko.observable(lat);
-		this.lon  = ko.observable(lon);
-
-		marker = new google.maps.Marker({
-			icon: 'img/red-dot.png',
-			position: new google.maps.LatLng(lat, lon),
-			place_id: id
-		});
-		this.marker = ko.observable(marker);
-		this.isVisible = ko.observable(false);
-
-		this.isVisible.subscribe(function(currentState) {
-			if (currentState) {
-				marker.setMap(map);
-			} else {
-				marker.setMap(null);
-			}
-		});
-		this.isVisible(true);
-		// createMarker
-		//
-		// this.gfi = ko.computed(function() {
-		// 	getFoursquareInfo(lat, lon);
-	  // }, this);
-		// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
-		google.maps.event.addListener(marker, 'click', function() {
-			var googleinfowintext = gname;
-			if (googleinfowin) googleinfowin.close();
-			googleinfowin.setContent(googleinfowintext);
-			googleinfowin.open(map, marker);
-			map.panTo(marker.position);
-			marker.setAnimation(google.maps.Animation.BOUNCE);
-			setTimeout(function(){marker.setAnimation(null);}, 1000);
-		});
-	};
 	/**
 	* This should help asynchronously execute functions. It will be used to fetch
 	* some json objects. Code based on URL below
@@ -182,37 +195,26 @@ function neighborhoodMapViewModel() {
 			results.forEach(function (place){
 				var lat = place.geometry.location.lat();
 				var lon = place.geometry.location.lng();
+				var idx = results.indexOf(place);
+				// console.log(idx);
 				// var marker = getFoursquareInfo(lat, lon);
-				var pin = new Pin(map, place.name, lat, lon, place.place_id);
+				var pin = new Pin(map, place.name, lat, lon, place.place_id, idx);
 				bounds.extend(new google.maps.LatLng(latitude,longitude));
 				// getFoursquareIdList(lat, lon);
 				self.pins.push(pin);
 			});
-			// BELOW UNDEFINED. PUSHING IN getFoursquareIdList NOT WORKING
-			// console.log(self.fsidArray);
 			map.fitBounds(bounds);
 			map.setCenter(bounds.getCenter());
 		}
 	}
-// I AM ATTEMPTING TO STORE A LIST OF VENUE ID SO THAT I CAN STORE AND MAKE ASYNC REQUESTS MORE EFFICIENTLY
-	function getFoursquareIdList(lat, lon) {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
-		$.getJSON(foursquareURL, function(data) {
-			// console.log('yeah '+data.response.venues[0].name);
-			var fsqid = data.response.venues[0].id;
-			fsidArray.push(fsqid);
-		}).error(function(e){
-			console.log('oops');
-		});
-	}
-// THIS IS ESSENTIALLY SAME CODE AS ABOVE FOR TESTING PURPOSES. THE URL IS ACTUALLY DIFFERENT TO GRAB
 // SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
-	function getFoursquareInfo(lat, lon) {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
+	function getFoursquareDetail(pos) {
+		var fsid = fsidArray[pos];
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
 		$.getJSON(foursquareURL, function(data) {
-			console.log('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
-			self.foursquareInfo = data.response.venues[0].name;
-			// self.fsidArray.push(fsqid);
+			// self.foursquareInfo = data.response.venues[0].name;
+			// ('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
+			console.log(fsid);
 		}).error(function(e){
 			console.log('oops');
 		});
@@ -221,7 +223,7 @@ function neighborhoodMapViewModel() {
 	Function that will open info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
-		getFoursquareInfo(place.lat(), place.lon());
+		getFoursquareDetail(place.fsqArrayPos());
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		// var getFoursquareInfoDetail;
 		var marker = place.marker();
@@ -230,7 +232,7 @@ function neighborhoodMapViewModel() {
 		if (googleinfowin) googleinfowin.close();
 		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
-			var googleinfowintext = place.googlename() +'<br>4sq: '+ self.foursquareInfo;
+			var googleinfowintext = place.googlename() +'<br>4sq: '; //+ self.foursquareInfo;
 			var infowindowDiv = document.createElement('div');
 			infowindowDiv.innerHTML = googleinfowintext;
 			googleinfowin.setContent(infowindowDiv);
