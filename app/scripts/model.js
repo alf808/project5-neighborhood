@@ -1,40 +1,57 @@
 var map;
-var fsidArray = [];
+// var fsidArray = [];
 var googleinfowin;
-fsidArray = [
-	'4bdcbcf83904a59350894f9e',
-	'4b36d86bf964a520543d25e3',
-	'4c4a6bd8c668e21e95f898f8',
-	'4b058655f964a520ea5c22e3',
-	'4b058656f964a5206a5d22e3',
-	'4b058653f964a5208e5c22e3',
-	'4f24fe9de4b0d10db11500b2',
-	'4bb9276f3db7b713c110229a',
-	'4b902633f964a5209d7833e3',
-	'4b05fccbf964a520fae622e3',
-	'4bbabd8653649c74406a49fb',
-	'4aee4eaaf964a52077d321e3',
-	'4d6dbaa732ab5941e5c680b9',
-	'4bc7e89b8b7c9c742d6d37cf',
-	'4b9f1fe0f964a520b51437e3',
-	'4cde02c9825e721e55e86745'
+
+var googleplaces = [
+[21.275936,-157.814551,'Rainbow Drive-In','4b058655f964a520ea5c22e3'],
+[21.280072,-157.814183,'Ono Hawaiian Foods','4b058653f964a5208e5c22e3'],
+[21.27885,-157.814144,'Side Street Inn','4c4a6bd8c668e21e95f898f8'],
+[21.2786,-157.81370000000004,'Papa John\'s Pizza','4bbabd8653649c74406a49fb'],
+[21.277741,-157.813856,'Uncle Bo\'s Pupu Bar & Grill','4b058656f964a5206a5d22e3'],
+[21.281801,-157.81444699999997,'Haili\'s Hawaiian Food','4b36d86bf964a520543d25e3'],
+[21.281342,-157.814256,'Yakitori Glad Hawaii','4f24fe9de4b0d10db11500b2'],
+[21.279026,-157.81379100000004,'Starbucks Coffee','4b05fccbf964a520fae622e3'],
+[21.280317,-157.81392,'Taco Bell','4d6dbaa732ab5941e5c680b9'],
+[21.278312,-157.813671,'Zippy\'s Kapahulu','4aee4eaaf964a52077d321e3'],
+[21.282899,-157.813576,'Waiola Shave Ice','4bb9276f3db7b713c110229a'],
+[21.280828,-157.813852,'Ono Seafood Takeaway','4b902633f964a5209d7833e3'],
+[21.279021,-157.813692,'Kozo Sushi','4bc7e89b8b7c9c742d6d37cf'],
+[21.281363,-157.814347,'Pizza Hut','4b9f1fe0f964a520b51437e3'],
+[21.278881,-157.813688,'Tenkaippin Hawaii','4b058656f964a520605d22e3'],
+[21.277838,-157.81381999999996,'Irifune Restaurant','4b071fa2f964a520b2f722e3'],
+[21.27691,-157.814208,'Sunrise Restaurant','4c1da836fcf8c9b6853aac0b']
 ];
 
-var Pin = function(map, gname, lat, lon, id, idx) {
+var Pin = function(map, gname, lat, lon, fsqid) {
+	(function() {
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsqid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
+	  $.getJSON(foursquareURL, function(data) {
+	    callbackFn(data);
+	  }).error(function(e){
+	    console.log('oops');
+	  });
+	})();
+
+	function callbackFn(data) {
+	    // console.log('yeah '+data.response.venues[0].name);
+	    // fsidArray.push(data.response.venues[0].id);
+			// console.log(data.response.venues[0].id);
+			fsqinfodetail = data.response.venue.name;
+	}
+
 	var self = this;
 	var marker;
 	var fsqinfodetail;
 	// self.getFoursquareInfo(lat, lon);
-	self.fsqid = ko.observable('');
+	self.fsqid = ko.observable(fsqid);
 	self.googlename = ko.observable(gname);
 	self.lat  = ko.observable(lat);
 	self.lon  = ko.observable(lon);
-	self.fsqArrayPos = ko.observable(idx);
+	// self.fsqArrayPos = ko.observable(idx);
 
 	marker = new google.maps.Marker({
 		icon: 'img/red-dot.png',
-		position: new google.maps.LatLng(lat, lon),
-		place_id: id
+		position: new google.maps.LatLng(lat, lon)
 	});
 	self.marker = ko.observable(marker);
 	self.isVisible = ko.observable(false);
@@ -49,25 +66,11 @@ var Pin = function(map, gname, lat, lon, id, idx) {
 	self.isVisible(true);
 	// createMarker
 	//
-	(function() {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsidArray[idx] + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
-	  $.getJSON(foursquareURL, function(data) {
-	    callbackFunction(data);
-	  }).error(function(e){
-	    console.log('oops');
-	  });
-	})();
-
-	function callbackFunction(data) {
-	    // console.log('yeah '+data.response.venues[0].name);
-	    // fsidArray.push(data.response.venues[0].id);
-			// console.log(data.response.venues[0].id);
-			fsqinfodetail = data.response.venue.name;
-	}
-
 	// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
 	google.maps.event.addListener(marker, 'click', function() {
 		var googleinfowintext = gname + '<br>4sq: ' + fsqinfodetail;
+		console.log(gname + ' ' + fsqid);
+		// var googleinfowintext = 'hello';
 		if (googleinfowin) googleinfowin.close();
 		googleinfowin.setContent(googleinfowintext);
 		googleinfowin.open(map, marker);
@@ -197,64 +200,47 @@ function neighborhoodMapViewModel() {
 	Function to pre-populate the map -- nearbySearch retuns up to 20 places.
 	*/
 	function getGooglePlaces() {
-		var request = {
-			location: kapahulu,
-			radius: 500,
-			types: ['restaurant', 'cafe', 'food'],
-		};
+		// var request = {
+		// 	location: kapahulu,
+		// 	radius: 500,
+		// 	types: ['restaurant', 'cafe', 'food',],
+		// };
 		googleinfowin = new google.maps.InfoWindow();
-		service = new google.maps.places.PlacesService(map);
-		service.nearbySearch(request, callback);
-	}
-	/*
-	Gets the callback from Google and creates a Pin marker for each place.
-	*/
-	function callback(results1, status) {
-		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			results = results1.slice(0,16);
-			var bounds = window.mapBounds;
-			results.forEach(function (place){
-				var lat = place.geometry.location.lat();
-				var lon = place.geometry.location.lng();
-				var idx = results.indexOf(place);
-				// console.log(idx);
-				// var marker = getFoursquareInfo(lat, lon);
-				var pin = new Pin(map, place.name, lat, lon, place.place_id, idx);
-				bounds.extend(new google.maps.LatLng(latitude,longitude));
-				// getFoursquareIdList(lat, lon);
-				self.pins.push(pin);
-			});
-			// console.log(self.pins.length);
-			console.log(fsidArray.length);
-			map.fitBounds(bounds);
-			map.setCenter(bounds.getCenter());
+		// service = new google.maps.places.PlacesService(map);
+		// service.nearbySearch(request, callback);
+		var bounds = window.mapBounds;
+
+		for(var i = 0; i < googleplaces.length; i++){
+			var lat = googleplaces[i][0];
+			var lon = googleplaces[i][1];
+			var fsqid = googleplaces[i][3];
+			var gname = googleplaces[i][2];
+			var pin = new Pin(map, gname, lat, lon, fsqid);
+			bounds.extend(new google.maps.LatLng(latitude,longitude));
+			self.pins.push(pin);
 		}
+		map.fitBounds(bounds);
+		map.setCenter(bounds.getCenter());
 	}
+
 // SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
-	function getFoursquareDetail(pos) {
-		// var fsid = fsidArray[pos];
-		console.log(fsidArray[pos]);
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsidArray[pos] + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
+	function getFoursquareDetail(fsid) {
+		// console.log(fsidArray[pos]);
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
 		$.getJSON(foursquareURL, function(data) {
-			// self.foursquareInfo = data.response.venues[0].name;
-			// ('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
 				callbackFn2(data);
-				// fsqinfodetail = data.response.venue.name;
-				// console.log(data.response.venue.name);
 		}).error(function(e){
 				console.log('oops');
 		});
 	}
 	function callbackFn2(data) {
-			// console.log('yeah '+data.response.venue.name);
 			fsqinfodetail = data.response.venue.name;
-			console.log(data.response.venue.name);
 	}
 	/*
 	Function that will open info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
-		getFoursquareDetail(place.fsqArrayPos());
+		getFoursquareDetail(place.fsqid());
 
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		// var getFoursquareInfoDetail;
@@ -264,7 +250,9 @@ function neighborhoodMapViewModel() {
 		if (googleinfowin) googleinfowin.close();
 		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
-			var googleinfowintext = place.googlename() +'<br>4sq: '+ fsqinfodetail;
+			var googleinfowintext = place.googlename() + '<br>4sq: ' + place.fsqid();
+			// console.log(place.googlename() + ' ' + place.fsqid());
+			// var googleinfowintext = 'hello';
 			var infowindowDiv = document.createElement('div');
 			infowindowDiv.innerHTML = googleinfowintext;
 			googleinfowin.setContent(infowindowDiv);
