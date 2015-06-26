@@ -1,10 +1,29 @@
 var map;
 var fsidArray = [];
 var googleinfowin;
+fsidArray = [
+	'4bdcbcf83904a59350894f9e',
+	'4b36d86bf964a520543d25e3',
+	'4c4a6bd8c668e21e95f898f8',
+	'4b058655f964a520ea5c22e3',
+	'4b058656f964a5206a5d22e3',
+	'4b058653f964a5208e5c22e3',
+	'4f24fe9de4b0d10db11500b2',
+	'4bb9276f3db7b713c110229a',
+	'4b902633f964a5209d7833e3',
+	'4b05fccbf964a520fae622e3',
+	'4bbabd8653649c74406a49fb',
+	'4aee4eaaf964a52077d321e3',
+	'4d6dbaa732ab5941e5c680b9',
+	'4bc7e89b8b7c9c742d6d37cf',
+	'4b9f1fe0f964a520b51437e3',
+	'4cde02c9825e721e55e86745'
+];
 
 var Pin = function(map, gname, lat, lon, id, idx) {
 	var self = this;
 	var marker;
+	var fsqinfodetail;
 	// self.getFoursquareInfo(lat, lon);
 	self.fsqid = ko.observable('');
 	self.googlename = ko.observable(gname);
@@ -31,7 +50,7 @@ var Pin = function(map, gname, lat, lon, id, idx) {
 	// createMarker
 	//
 	(function() {
-	  var foursquareURL = 'http://api.foursquare.com/v2/venues/search?ll=' +lat+ ',' +lon+ '&oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json&limit=1';
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsidArray[idx] + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
 	  $.getJSON(foursquareURL, function(data) {
 	    callbackFunction(data);
 	  }).error(function(e){
@@ -41,13 +60,14 @@ var Pin = function(map, gname, lat, lon, id, idx) {
 
 	function callbackFunction(data) {
 	    // console.log('yeah '+data.response.venues[0].name);
-	    fsidArray.push(data.response.venues[0].id);
-	    // self.fsqid = data.response.venues[0].id;
+	    // fsidArray.push(data.response.venues[0].id);
+			// console.log(data.response.venues[0].id);
+			fsqinfodetail = data.response.venue.name;
 	}
 
 	// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
 	google.maps.event.addListener(marker, 'click', function() {
-		var googleinfowintext = self.googlename();
+		var googleinfowintext = gname + '<br>4sq: ' + fsqinfodetail;
 		if (googleinfowin) googleinfowin.close();
 		googleinfowin.setContent(googleinfowintext);
 		googleinfowin.open(map, marker);
@@ -60,6 +80,7 @@ var Pin = function(map, gname, lat, lon, id, idx) {
 function neighborhoodMapViewModel() {
 	var self = this;
 	var service;
+	var fsqinfodetail;
 
 	// kapahulu area's latitude and longitude
 	var latitude = 21.2790587;
@@ -203,27 +224,38 @@ function neighborhoodMapViewModel() {
 				// getFoursquareIdList(lat, lon);
 				self.pins.push(pin);
 			});
+			// console.log(self.pins.length);
+			console.log(fsidArray.length);
 			map.fitBounds(bounds);
 			map.setCenter(bounds.getCenter());
 		}
 	}
 // SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
 	function getFoursquareDetail(pos) {
-		var fsid = fsidArray[pos];
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
+		// var fsid = fsidArray[pos];
+		console.log(fsidArray[pos]);
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsidArray[pos] + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
 		$.getJSON(foursquareURL, function(data) {
 			// self.foursquareInfo = data.response.venues[0].name;
 			// ('4SQ info: ' + data.response.venues[0].name + '\n' + data.response.venues[0].id);
-			console.log(fsid);
+				callbackFn2(data);
+				// fsqinfodetail = data.response.venue.name;
+				// console.log(data.response.venue.name);
 		}).error(function(e){
-			console.log('oops');
+				console.log('oops');
 		});
+	}
+	function callbackFn2(data) {
+			// console.log('yeah '+data.response.venue.name);
+			fsqinfodetail = data.response.venue.name;
+			console.log(data.response.venue.name);
 	}
 	/*
 	Function that will open info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
 		getFoursquareDetail(place.fsqArrayPos());
+
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 		// var getFoursquareInfoDetail;
 		var marker = place.marker();
@@ -232,7 +264,7 @@ function neighborhoodMapViewModel() {
 		if (googleinfowin) googleinfowin.close();
 		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
-			var googleinfowintext = place.googlename() +'<br>4sq: '; //+ self.foursquareInfo;
+			var googleinfowintext = place.googlename() +'<br>4sq: '+ fsqinfodetail;
 			var infowindowDiv = document.createElement('div');
 			infowindowDiv.innerHTML = googleinfowintext;
 			googleinfowin.setContent(infowindowDiv);
