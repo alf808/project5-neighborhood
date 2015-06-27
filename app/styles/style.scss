@@ -53,6 +53,10 @@ hr {
 //	height:calc(100% - 0px);
 }
 
+.googleinfowindow {
+// to be prepared if styling of Infowindow will be required
+}
+
 .reset-button {
 	background-color: $yellow;
 border: 2px solid #fff;
@@ -70,19 +74,15 @@ text-align: center;
 	line-height: 2.375em;
 	padding-left: .375em;
 	padding-right: .375em;
-
 }
 
 .controls {
 	margin-top: 1em;
 	border: 1px solid transparent;
-	//Instead of the line below you could use @includeborder-radius($radius, $vertical-radius)
 	border-radius: 2px 0 0 2px;
-	//Instead of the line below you could use @includebox-sizing($bs)
 	box-sizing: border-box;
 	height: 2em;
 	outline: none;
-	//Instead of the line below you could use @includebox-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
 	box-shadow: 0 2px .375em $black_30;
 }
 
@@ -123,7 +123,6 @@ text-align: center;
 	width: 40%;
 	&:focus {
 		border-color: $color_cornflower_blue_approx;
-//		margin-left: -1px;
 		padding-left: .875em;
 		width: 41%;
 	}
