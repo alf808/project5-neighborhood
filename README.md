@@ -36,5 +36,5 @@
 * <a href="https://developer.foursquare.com/docs/">Foursquare's API docs</a>
 * <a href="https://github.com/knockout/knockout/wiki/asynchronous-dependent-observables">An explanation of Asynchronous calls with Knockout</a>
 * <a href="http://api.jquery.com/category/ajax/">jQuery's AJAX documentation</a>
-* <a href="stackoverflow.com">Innumerable resources from stackoverflow.com</a>
+* <a href="http://stackoverflow.com">Innumerable resources from stackoverflow.com</a>
 * Udacity's AJAX course, Ben Jaffe's Javascript Design Patterns, an office hour with Udacity coach John on June 24 2015, and an appointment with Udacity coach John on June 25 2015.
