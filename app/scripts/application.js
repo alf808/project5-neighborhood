@@ -1,53 +1,28 @@
 var map;
-// var fsidArray = [];
 var googleinfowin;
+// var fsqinfodetail;
+var foursquareData = [];
 
-var googleplaces = [
-[21.275936,-157.814551,'Rainbow Drive-In','4b058655f964a520ea5c22e3'],
-[21.280072,-157.814183,'Ono Hawaiian Foods','4b058653f964a5208e5c22e3'],
-[21.27885,-157.814144,'Side Street Inn','4c4a6bd8c668e21e95f898f8'],
-[21.2786,-157.81370000000004,'Papa John\'s Pizza','4bbabd8653649c74406a49fb'],
-[21.277741,-157.813856,'Uncle Bo\'s Pupu Bar & Grill','4b058656f964a5206a5d22e3'],
-[21.281801,-157.81444699999997,'Haili\'s Hawaiian Food','4b36d86bf964a520543d25e3'],
-[21.281342,-157.814256,'Yakitori Glad Hawaii','4f24fe9de4b0d10db11500b2'],
-[21.279026,-157.81379100000004,'Starbucks Coffee','4b05fccbf964a520fae622e3'],
-[21.280317,-157.81392,'Taco Bell','4d6dbaa732ab5941e5c680b9'],
-[21.278312,-157.813671,'Zippy\'s Kapahulu','4aee4eaaf964a52077d321e3'],
-[21.282899,-157.813576,'Waiola Shave Ice','4bb9276f3db7b713c110229a'],
-[21.280828,-157.813852,'Ono Seafood Takeaway','4b902633f964a5209d7833e3'],
-[21.279021,-157.813692,'Kozo Sushi','4bc7e89b8b7c9c742d6d37cf'],
-[21.281363,-157.814347,'Pizza Hut','4b9f1fe0f964a520b51437e3'],
-[21.278881,-157.813688,'Tenkaippin Hawaii','4b058656f964a520605d22e3'],
-[21.277838,-157.81381999999996,'Irifune Restaurant','4b071fa2f964a520b2f722e3'],
-[21.27691,-157.814208,'Sunrise Restaurant','4c1da836fcf8c9b6853aac0b']
-];
-
-var Pin = function(map, gname, lat, lon, fsqid) {
-	(function() {
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsqid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
-	  $.getJSON(foursquareURL, function(data) {
-	    callbackFn(data);
-	  }).error(function(e){
-	    console.log('oops');
-	  });
-	})();
-
-	function callbackFn(data) {
-	    // console.log('yeah '+data.response.venues[0].name);
-	    // fsidArray.push(data.response.venues[0].id);
-			// console.log(data.response.venues[0].id);
-			fsqinfodetail = data.response.venue.name;
-	}
+/**
+* The basis of this code is the Pin class below. It is based on code below
+* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
+*/
+var Pin = function(map, gname, lat, lon, fsqid, idx) {
+	var fsqinfodetail;
+	// Function below is used to help the asynchronous fetch of Foursquare data.
+	// function callbackFn(data) {
+	// 		// fsqinfodetail = data.response.venue.name;
+	// 	var d = data.response.venue;
+	// 	fsqinfodetail = d.contact.formattedPhone + '<br>' + d.location.formattedAddress[0] + '<br>' + d.location.formattedAddress[1] + '<br>Rating: ' + d.rating + '<br>' + d.url;
+	// }
 
 	var self = this;
 	var marker;
-	var fsqinfodetail;
-	// self.getFoursquareInfo(lat, lon);
-	self.fsqid = ko.observable(fsqid);
+	// self.fsqid = ko.observable(fsqid);
 	self.googlename = ko.observable(gname);
 	self.lat  = ko.observable(lat);
 	self.lon  = ko.observable(lon);
-	// self.fsqArrayPos = ko.observable(idx);
+	self.idx = ko.observable(idx);
 
 	marker = new google.maps.Marker({
 		icon: 'img/red-dot.png',
@@ -64,13 +39,39 @@ var Pin = function(map, gname, lat, lon, fsqid) {
 		}
 	});
 	self.isVisible(true);
+
+	/**
+	* The IFFE is immediately invoked as a pin object is instantiated. It fetches
+	* information on the on a specific Foursquare venue.
+	*/
+	(function() {
+		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsqid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
+	  $.getJSON(foursquareURL, function(data) {
+	    callbackFn(data,idx);
+	  }).error(function(e){
+	    console.log('oops');
+	  });
+	})();
+
+	// Function below is used to help the asynchronous fetch of Foursquare data.
+	function callbackFn(data,idx) {
+		var d = data.response.venue;
+		var phone = d.contact.formattedPhone || " ";
+		var street = d.location.formattedAddress[0] || " ";
+		var city = d.location.formattedAddress[1] || " ";
+		var rate = d.rating || " ";
+		var u = d.url || " ";
+		fsqinfodetail = phone + '<br>' + street + '<br>' + city + '<br>Rating: ' + rate + '<br>' + u;
+		var tarray = [phone, street, city, rate, u];
+		console.log(tarray);
+		foursquareData.push(tarray);
+	}
+
 	// createMarker
-	//
 	// NEED TO DO CLICK LISTENER HERE BUT VIOLATES dry . I wrote this below too
 	google.maps.event.addListener(marker, 'click', function() {
-		var googleinfowintext = gname + '<br>4sq: ' + fsqinfodetail;
-		console.log(gname + ' ' + fsqid);
-		// var googleinfowintext = 'hello';
+		var googleinfowintext = gname + '<br>Foursquare Info:<br>' + fsqinfodetail;
+		// console.log(gname + ' ' + fsqid);
 		if (googleinfowin) googleinfowin.close();
 		googleinfowin.setContent(googleinfowintext);
 		googleinfowin.open(map, marker);
@@ -78,6 +79,7 @@ var Pin = function(map, gname, lat, lon, fsqid) {
 		marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){marker.setAnimation(null);}, 1000);
 	});
+
 };
 
 function neighborhoodMapViewModel() {
@@ -97,23 +99,6 @@ function neighborhoodMapViewModel() {
 
 	// string to hold foursquare information
 	self.foursquareInfo = '';
-	/**
-	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
-	*/
-	/**
-	* This should help asynchronously execute functions. It will be used to fetch
-	* some json objects. Code based on URL below
-	* https://github.com/knockout/knockout/wiki/Asynchronous-Dependent-Observables
-	*/
-	function asyncComputed(evaluator, owner) {
-		var result = ko.observable();
-
-		ko.computed(function() {
-			// Get the $.Deferred value, and then set up a callback
-			evaluator.call(owner).done(result);
-		});
-		return result;
-	}
 	/**
 	* The CenterControl adds a control to the map that recenters the map on Neighborhood.
 	* This constructor takes the control DIV as an argument.
@@ -200,14 +185,7 @@ function neighborhoodMapViewModel() {
 	Function to pre-populate the map -- nearbySearch retuns up to 20 places.
 	*/
 	function getGooglePlaces() {
-		// var request = {
-		// 	location: kapahulu,
-		// 	radius: 500,
-		// 	types: ['restaurant', 'cafe', 'food',],
-		// };
 		googleinfowin = new google.maps.InfoWindow();
-		// service = new google.maps.places.PlacesService(map);
-		// service.nearbySearch(request, callback);
 		var bounds = window.mapBounds;
 
 		for(var i = 0; i < googleplaces.length; i++){
@@ -215,7 +193,7 @@ function neighborhoodMapViewModel() {
 			var lon = googleplaces[i][1];
 			var fsqid = googleplaces[i][3];
 			var gname = googleplaces[i][2];
-			var pin = new Pin(map, gname, lat, lon, fsqid);
+			var pin = new Pin(map, gname, lat, lon, fsqid, i);
 			bounds.extend(new google.maps.LatLng(latitude,longitude));
 			self.pins.push(pin);
 		}
@@ -225,34 +203,32 @@ function neighborhoodMapViewModel() {
 
 // SPECIFIC VENUE INFO: http://api.foursquare.com/v2/venues/VENUE_ID
 	function getFoursquareDetail(fsid) {
-		// console.log(fsidArray[pos]);
-		var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
-		$.getJSON(foursquareURL, function(data) {
-				callbackFn2(data);
-		}).error(function(e){
-				console.log('oops');
-		});
+		var d = foursquareData[fsid];
+		// var foursquareURL = 'http://api.foursquare.com/v2/venues/' + fsid + '?oauth_token=GQDPA05ROIS0UO5KO3YQEW4KGYBC2QOW1PCKD0HMQR5COFVH&v=20150830&m=foursquare&format=json';
+		// $.getJSON(foursquareURL, function(data) {
+		// 		callbackFn2(data);
+		// }).error(function(e){
+		// 		console.log('oops');
+		// });
+		fsqinfodetail = d[0] + '<br>' + d[1] + '<br>' + d[2] + '<br>' + d[3] + '<br>' + d[4];
 	}
-	function callbackFn2(data) {
-			fsqinfodetail = data.response.venue.name;
-	}
+	// function callbackFn2(data) {
+	// 		var d = data.response.venue;
+	// 		fsqinfodetail = d.contact.formattedPhone + '<br>' + d.location.formattedAddress[0] + '<br>' + d.location.formattedAddress[1] + '<br>Rating: ' + d.rating + '<br>' + d.url;
+	// }
 	/*
 	Function that will open info window of an item clicked in the list.
 	*/
 	self.clickMarker = function(place) {
-		getFoursquareDetail(place.fsqid());
-
+		getFoursquareDetail(place.idx());
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
-		// var getFoursquareInfoDetail;
 		var marker = place.marker();
 
 		map.panTo(pos);
 		if (googleinfowin) googleinfowin.close();
 		// wait for a few milliseconds to get info from foursquare.
 		setTimeout(function() {
-			var googleinfowintext = place.googlename() + '<br>4sq: ' + place.fsqid();
-			// console.log(place.googlename() + ' ' + place.fsqid());
-			// var googleinfowintext = 'hello';
+			var googleinfowintext = place.googlename() + '<br>Foursquare Info:<br>' + fsqinfodetail;
 			var infowindowDiv = document.createElement('div');
 			infowindowDiv.innerHTML = googleinfowintext;
 			googleinfowin.setContent(infowindowDiv);

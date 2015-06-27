@@ -1,9 +1,12 @@
 ## Neighborhood Map project
 
 ### Separation of Concerns
-Although separation of concerns has already been intimated in previous projects -- from styling separation in project 1, JSON models in project 2, pseudo-classical object-orientation in project 3, and even in the optimization project with DOM manipulation in JS code --, it's not until project 5 in which it was explicit that the view and the controller be separated as illustrated in Ben Jaffe's JavaScript Design Patterns course.
 
-The task was to use knockout to illustrate the MVVM principle in that we had to bind variables in the view which was manipulated in the viewModel JS code. My code starts with a Pin class which is basically the app's sole model which corresponds to google map markers in the view.
+1. Although separation of concerns has already been intimated in previous projects -- from styling separation in project 1, JSON models in project 2, pseudo-classical object-orientation in project 3, and even in the optimization project with DOM manipulation in JS code --, it's not until project 5 in which it was explicit that the view and the controller be separated as illustrated in Ben Jaffe's JavaScript Design Patterns course.
+
+1. The task was to use knockout to illustrate the MVVM principle in that we had to bind variables in the view which was manipulated in the viewModel JS code. My code starts with a Pin class which is basically the app's sole model which corresponds to google map markers in the view.
+
+1. Google Map's InfoWindow does not lend itself to styling. As much as I wanted to eliminate the HTML tags in the viewModel, the combination of the async request and the DOM manipulation required a lot of waiting time producing inaccurate results on click.
 
 ### Part 1
 
