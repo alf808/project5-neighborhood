@@ -1,5 +1,9 @@
 ## Neighborhood Map project
 
+reviewer recommends
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+but google says no. "negatively impacts accessibility"
+https://developers.google.com/speed/docs/insights/ConfigureViewport
 ### Separation of Concerns
 
 1. Although separation of concerns has already been intimated in previous projects -- from styling separation in project 1, JSON models in project 2, pseudo-classical object-orientation in project 3, and even in the optimization project with DOM manipulation in JS code --, it's not until project 5 in which it was explicit that the view and the controller be separated as illustrated in Ben Jaffe's JavaScript Design Patterns course.
@@ -8,7 +12,7 @@
 
 1. There are some functions that could have been encapsulated in the Pin class as it was required in the OOP project. However scoping issues came up when I attempted to use the pseudo-classical OOP structure with prototypal methods when using Knockout. I need to do more research to accomplish this.
 
-1. Google Map's InfoWindow does not lend itself easily to styling. It is possible to style it. I prepared my code to do a DOM manipulation in case it be required in the future to style InfoWindow more intricately.
+1. Google Map's InfoWindow does not lend itself easily to styling. It is possible to style it. I prepared my code to do DOM manipulation in case it be required in the future to style InfoWindow more intricately.
 
 ### Functionality of the Neighborhood application
 

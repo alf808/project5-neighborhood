@@ -1,4 +1,5 @@
 var map; // sole global variable
+var mapCenter;
 /**
 * This is viewModel that interfaces with the view in index.html
 */
@@ -14,7 +15,7 @@ function neighborhoodMapViewModel() {
 	var kapahulu = new google.maps.LatLng(latitude, longitude);
 
 	// These variables help keep track of the visible markers and list of venues
-	self.pins = ko.observableArray([]);
+	self.pins = ko.observableArray();
 	self.query = ko.observable('');
 	/**
 	* The sole model in this application -- the Pin class. It is based on code from
@@ -49,6 +50,8 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addListener(marker, 'click', function() {
 			var fsdata = getFoursquareFromArray(fsid);
 			map.panTo(marker.position);
+			mapCenter = map.setCenter(marker.position);
+//			map.setCenter(marker.position);
 			prepareInfowin(gname,marker,fsdata);
 		});
 	};
@@ -131,6 +134,7 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addListener(map, 'click', function() {
 			googleinfowin.close();
 		});
+		mapCenter = map.getCenter();
 	}
 	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
@@ -166,10 +170,12 @@ function neighborhoodMapViewModel() {
 			var pin = new Pin(map, gname, lat, lon, fsid);
 			getFoursquareDetail(fsid);
 			bounds.extend(new google.maps.LatLng(latitude,longitude));
+//		map.fitBounds(bounds);
+//		map.setCenter(bounds.getCenter());
 			self.pins.push(pin);
 		}
 		map.fitBounds(bounds);
-		map.setCenter(bounds.getCenter());
+//		map.setCenter(bounds.getCenter());
 	}
 	/**
 	* The async request to Foursquare: http://api.foursquare.com/v2/venues/VENUE_ID.
@@ -215,14 +221,20 @@ function neighborhoodMapViewModel() {
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 
 		map.panTo(pos);
+		mapCenter = map.setCenter(pos);
 		prepareInfowin(place.googlename(),place.marker(),fsdata);
 	};
 	// The initialize function is invoked upon launching this application
 	google.maps.event.addDomListener(window, 'load', initialize);
 	window.mapBounds = new google.maps.LatLngBounds();
-	window.addEventListener('resize', function(e) {
-		map.fitBounds(mapBounds);
-	});
+//	window.addEventListener('resize', function(e) {
+//		map.fitBounds(mapBounds);
+//		map.setCenter(window.mapBounds.getCenter());
+//	});
+google.maps.event.addDomListener(window, 'resize', function() {
+//google.maps.event.trigger(map, "resize");
+		map.setCenter(mapCenter);
+});
 }
 
 ko.applyBindings(new neighborhoodMapViewModel());
