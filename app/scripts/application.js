@@ -1,5 +1,7 @@
+//'use strict';
+
 var map; // sole global variable
-var mapCenter;
+//var mapCenter;
 /**
 * This is viewModel that interfaces with the view in index.html
 */
@@ -8,11 +10,7 @@ function neighborhoodMapViewModel() {
 	var service;
 	var googleinfowin;
 	var foursquareData = [];
-
-	// Kapahulu area's latitude and longitude
-	var latitude = 21.2790587;
-	var longitude = -157.81368810000004;
-	var kapahulu = new google.maps.LatLng(latitude, longitude);
+	var kapahulu;
 
 	// These variables help keep track of the visible markers and list of venues
 	self.pins = ko.observableArray();
@@ -21,7 +19,7 @@ function neighborhoodMapViewModel() {
 	* The sole model in this application -- the Pin class. It is based on code from
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
-	var Pin = function(map, gname, lat, lon, fsid) {
+	var Pin = function(map, gname, lat, lon, fsid, pos) {
 		var self = this;
 		var marker;
 		// The observables below are bound to the list in the view
@@ -32,7 +30,7 @@ function neighborhoodMapViewModel() {
 
 		marker = new google.maps.Marker({
 			icon: 'img/red-dot.png',
-			position: new google.maps.LatLng(lat, lon)
+			position: pos
 		});
 		self.marker = ko.observable(marker);
 		self.isVisible = ko.observable(false);
@@ -49,8 +47,11 @@ function neighborhoodMapViewModel() {
 		// This adds the click listeners on each of the pin markers on the map
 		google.maps.event.addListener(marker, 'click', function() {
 			var fsdata = getFoursquareFromArray(fsid);
-			map.panTo(marker.position);
-			mapCenter = map.setCenter(marker.position);
+//			var tbounds = bounds;
+			map.panTo(pos);
+//			tbounds.extend(marker.position);
+//			map.fitBounds(marker.position);
+//			mapCenter = map.setCenter(pos);
 //			map.setCenter(marker.position);
 			prepareInfowin(gname,marker,fsdata);
 		});
@@ -64,6 +65,7 @@ function neighborhoodMapViewModel() {
 		var googleinfowintext = '<strong>' + gname + '</strong>' + '<hr>FOURSQUARE Info:<br>' + fsqinfodetail;
 		if (googleinfowin) googleinfowin.close();
 		var infowindowDiv = document.createElement('div');
+		infowindowDiv.className = "googleinfowindow";
 		infowindowDiv.innerHTML = googleinfowintext;
 		googleinfowin.setContent(infowindowDiv);
 		googleinfowin.open(map, marker);
@@ -98,33 +100,38 @@ function neighborhoodMapViewModel() {
 	self.list = document.getElementById('list');
 	var input = document.getElementById('pac-input');
 	var mapDiv = document.getElementById('map-canvas');
-	var mapOptions = {
-		zoom: 16, maxZoom: 16, minZoom: 10,
-		center: kapahulu,
-		disableDefaultUI: true,
-		zoomControl: true,
-		zoomControlOptions: {
-			style: google.maps.ZoomControlStyle.LARGE,
-			position: google.maps.ControlPosition.LEFT_TOP
-		},
-		scaleControl: true,
-		streetViewControl: true,
-		streetViewControlOptions: {
-			position: google.maps.ControlPosition.LEFT_TOP
-		}
-	};
 
 	function initialize() {
+		// Kapahulu area's latitude and longitude
+		var latitude = kapalatitude;
+		var longitude = kapalongitude;
+		kapahulu = new google.maps.LatLng(latitude, longitude);
+		var mapOptions = {
+			zoom: 16, maxZoom: 16, minZoom: 10,
+			center: kapahulu,
+			disableDefaultUI: true,
+			zoomControl: true,
+			zoomControlOptions: {
+				style: google.maps.ZoomControlStyle.LARGE,
+				position: google.maps.ControlPosition.RIGHT_TOP
+			},
+			scaleControl: true,
+			streetViewControl: true,
+			streetViewControlOptions: {
+				position: google.maps.ControlPosition.RIGHT_TOP
+			}
+		};
 		map = new google.maps.Map(mapDiv, mapOptions);
 		getGooglePlaces();
 		// Create the DIV to hold the control and call the CenterControl() constructor
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(self.list);
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+		map.controls[google.maps.ControlPosition.LEFT_TOP].push(self.list);
 
 		var centerControlDiv = document.createElement('div');
 		var centerControl = new CenterControl(centerControlDiv, map);
 		centerControlDiv.index = 1;
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(centerControlDiv);
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+//		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
 		// Handles an event where Google Maps takes too long to load
 		var timer = window.setTimeout(failedToLoad, 8000);
@@ -134,7 +141,8 @@ function neighborhoodMapViewModel() {
 		google.maps.event.addListener(map, 'click', function() {
 			googleinfowin.close();
 		});
-		mapCenter = map.getCenter();
+//		mapCenter = map.getCenter();
+//		calculateCenter();
 	}
 	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
@@ -159,23 +167,28 @@ function neighborhoodMapViewModel() {
 	* from googleplaces array
 	*/
 	function getGooglePlaces() {
-		googleinfowin = new google.maps.InfoWindow();
-		var bounds = window.mapBounds;
+		googleinfowin = new google.maps.InfoWindow({maxWidth:130});
+		var bounds = new google.maps.LatLngBounds();
 		var len = googleplaces.length;
 		for(var i = 0; i < len; i++){
 			var lat = googleplaces[i][0];
 			var lon = googleplaces[i][1];
 			var fsid = googleplaces[i][3];
 			var gname = googleplaces[i][2];
-			var pin = new Pin(map, gname, lat, lon, fsid);
+			var pos = new google.maps.LatLng(lat,lon);
+			var pin = new Pin(map, gname, lat, lon, fsid, pos);
 			getFoursquareDetail(fsid);
-			bounds.extend(new google.maps.LatLng(latitude,longitude));
+			bounds.extend(pos);
 //		map.fitBounds(bounds);
 //		map.setCenter(bounds.getCenter());
 			self.pins.push(pin);
 		}
 		map.fitBounds(bounds);
 //		map.setCenter(bounds.getCenter());
+	}
+
+	function calculateCenter() {
+	  mapCenter = map.getCenter();
 	}
 	/**
 	* The async request to Foursquare: http://api.foursquare.com/v2/venues/VENUE_ID.
@@ -221,19 +234,34 @@ function neighborhoodMapViewModel() {
 		var pos = new google.maps.LatLng(place.lat(), place.lon());
 
 		map.panTo(pos);
-		mapCenter = map.setCenter(pos);
+//		calculateCenter();
+//		mapCenter = map.setCenter(pos);
 		prepareInfowin(place.googlename(),place.marker(),fsdata);
 	};
 	// The initialize function is invoked upon launching this application
-	google.maps.event.addDomListener(window, 'load', initialize);
-	window.mapBounds = new google.maps.LatLngBounds();
+//google.maps.event.addDomListener(window, 'load', initialize);
+if (typeof google === 'object' && typeof google.maps === 'object') {
+		// Google maps loaded
+			google.maps.event.addDomListener(window, 'load', initialize);
+} else {
+		alert('oops');
+}
+
+//	window.mapBounds = new google.maps.LatLngBounds();
 //	window.addEventListener('resize', function(e) {
 //		map.fitBounds(mapBounds);
 //		map.setCenter(window.mapBounds.getCenter());
 //	});
+//google.maps.event.addDomListener(self, 'idle', function() {
+//  calculateCenter();
+//});
+
 google.maps.event.addDomListener(window, 'resize', function() {
-//google.maps.event.trigger(map, "resize");
-		map.setCenter(mapCenter);
+	if (googleinfowin) googleinfowin.close();
+	var center = map.getCenter();
+	google.maps.event.trigger(map, "resize");
+//		map.fitBounds(window.mapBounds);
+		map.setCenter(center);
 });
 }
 
