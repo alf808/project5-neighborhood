@@ -1,63 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-	<meta name="description" content="interesting places near Kapahulu, Diamond Head, and Waikiki Oahu Hawaii">
-	<meta name="author" content="Alf Maglalang">
-	<title>What is in my neighborhood</title>
-	<link href="libs/bootstrap.min.css" rel="stylesheet">
-	<link href="libs/offline-theme-default.css" rel="stylesheet">
-	<link href="libs/offline-language-english.css" rel="stylesheet">
-	<link href="styles/style.css" rel="stylesheet">
-	<script src="libs/offline.min.js"></script>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta name="description" content="interesting places near Kapahulu, Diamond Head, and Waikiki Oahu Hawaii">
+		<meta name="author" content="Alf Maglalang">
+		<title>What is in my neighborhood</title>
+		<link href="libs/bootstrap.min.css" rel="stylesheet">
+		<link href="libs/offline-theme-default.css" rel="stylesheet">
+		<link href="libs/offline-language-english.css" rel="stylesheet">
+		<link href="styles/style.css" rel="stylesheet">
+		<script src="libs/offline.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
+	</head>
+	<body>
+		<!-- Page Content -->
+		<div class="container">
 
-	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places"></script>
-</head>
-<body>
-	<!-- Page Content -->
-
-	<div class="container">
-
-		<div class="row">
-			<!-- map here -->
-			<div class="col-xs-12 map">
-				<div id="map-canvas"></div>
-<!-- div class="small-container" -->
-<!-- header -->
-			<!-- div class="search-div" -->
-				<input id="pac-input" class="controls" type="text" placeholder="Filter list of locations..." data-bind="textInput: query">
-			<!-- /div -->
-<!-- /header -->
-				<!-- list here -->
-<!-- aside -->
-				<div id="list">
-					<!-- h2>Check Out</h2 -->
-						<ul data-bind="foreach: filterPins">
-							<li data-bind="click: $parent.clickMarker">
-							<hr>
-							<p class="name"><span data-bind="text: googlename"></span></p>
-							</li>
-						</ul>
+			<div class="row">
+				<div class="col-xs-12 map">
+					<!-- map here and map controls here -->
+					<div id="map-canvas"></div>
+					<input id="pac-input" class="controls" type="text" placeholder="Filter list of locations..." data-bind="textInput: query">
+					<!-- list here -->
+					<div id="list">
+							<ul data-bind="foreach: filterPins">
+								<li data-bind="click: $parent.clickMarker">
+								<hr>
+								<p class="name"><span data-bind="text: googlename"></span></p>
+								</li>
+							</ul>
+					</div>
 				</div>
-<!-- /aside -->
-<!-- /div -->
 			</div>
+					<!-- /.row -->
 		</div>
-				<!-- /.row -->
-	</div>
-			<!-- /.container -->
+				<!-- /.container -->
 
-			<script src="libs/knockout.js"></script>
-			<!-- script src="https://cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.min.js"></script -->
-			<script src="libs/jquery.min.js"></script>
-			<!-- script src="libs/offline.min.js"></script -->
+		<script src="libs/knockout.js"></script>
+		<script src="libs/jquery.min.js"></script>
 
-			<!-- script src="libs/bootstrap.min.js"></script -->
-			<!-- build:js scripts/vmapp.min.js -->
-			<script src="scripts/data.js"></script>
-			<script src="scripts/application.js"></script>
-			<!-- endbuild -->
-		</body>
-		</html>
+		<!-- build:js scripts/vmapp.min.js -->
+		<script src="scripts/data.js"></script>
+		<script src="scripts/application.js"></script>
+		<!-- endbuild -->
+	</body>
+</html>

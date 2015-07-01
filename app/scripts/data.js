@@ -17,5 +17,3 @@ var googleplaces = [
 	[21.277838,-157.81381999999996,'Irifune Restaurant','4b071fa2f964a520b2f722e3'],
 	[21.27691,-157.814208,'Sunrise Restaurant','4c1da836fcf8c9b6853aac0b']
 ];
-var kapalatitude = 21.2790587;
-var kapalongitude = -157.81368810000004;

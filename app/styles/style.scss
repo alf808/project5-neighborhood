@@ -47,21 +47,19 @@ hr {
 	padding: 0;
 }
 #map-canvas {
-//	position:fixed;
 	height: 100%;
 	width: 100%;
-//	height:calc(100% - 0px);
 }
 
 .googleinfowindow {
-	font-size: .9em;
+	font-size: 1em;
 }
 
 .reset-button {
 	background-color: $yellow;
 	border: 2px solid #fff;
 	border-radius: 3px;
-	box-shadow: 0 2px .375em rgba(0,0,0,.3);
+	box-shadow: 0 2px .375em $black_30;
 	cursor: pointer;
 	margin-bottom: 1.375em;
 	margin-left: .375em;
