@@ -1,4 +1,7 @@
-var map; // sole global variable
+'use strict';
+/* GLOBALS */
+var map; // the map global variable
+var googname; // this global will be used for minimization of infowindow
 /**
 * This is viewModel that interfaces with the view in index.html
 */
@@ -7,20 +10,16 @@ function neighborhoodMapViewModel() {
 	var service;
 	var googleinfowin;
 	var foursquareData = [];
-
-	// Kapahulu area's latitude and longitude
-	var latitude = 21.2790587;
-	var longitude = -157.81368810000004;
-	var kapahulu = new google.maps.LatLng(latitude, longitude);
+	var kapahulu;
 
 	// These variables help keep track of the visible markers and list of venues
-	self.pins = ko.observableArray([]);
+	self.pins = ko.observableArray();
 	self.query = ko.observable('');
 	/**
 	* The sole model in this application -- the Pin class. It is based on code from
 	* http://stackoverflow.com/questions/29557938/removing-map-pin-with-search
 	*/
-	var Pin = function(map, gname, lat, lon, fsid) {
+	var Pin = function(map, gname, lat, lon, fsid, pos) {
 		var self = this;
 		var marker;
 		// The observables below are bound to the list in the view
@@ -31,7 +30,7 @@ function neighborhoodMapViewModel() {
 
 		marker = new google.maps.Marker({
 			icon: 'img/red-dot.png',
-			position: new google.maps.LatLng(lat, lon)
+			position: pos
 		});
 		self.marker = ko.observable(marker);
 		self.isVisible = ko.observable(false);
@@ -48,7 +47,7 @@ function neighborhoodMapViewModel() {
 		// This adds the click listeners on each of the pin markers on the map
 		google.maps.event.addListener(marker, 'click', function() {
 			var fsdata = getFoursquareFromArray(fsid);
-			map.panTo(marker.position);
+			map.panTo(pos);
 			prepareInfowin(gname,marker,fsdata);
 		});
 	};
@@ -58,11 +57,9 @@ function neighborhoodMapViewModel() {
 	*/
 	function prepareInfowin(gname,marker,fsdata) {
 		var fsqinfodetail = fsdata[1] + '<br>' + fsdata[2] + '<br>' + fsdata[3] + '<br>Rating: ' + fsdata[4] + '<br>URL: ' + fsdata[5];
+		googname = gname; // this will be used for minimization of infowindow
 		var googleinfowintext = '<strong>' + gname + '</strong>' + '<hr>FOURSQUARE Info:<br>' + fsqinfodetail;
-		if (googleinfowin) googleinfowin.close();
-		var infowindowDiv = document.createElement('div');
-		infowindowDiv.innerHTML = googleinfowintext;
-		googleinfowin.setContent(infowindowDiv);
+		googleinfowin.setContent(googleinfowintext);
 		googleinfowin.open(map, marker);
 		marker.setAnimation(google.maps.Animation.BOUNCE);
 		setTimeout(function(){marker.setAnimation(null);}, 1000);
@@ -95,33 +92,35 @@ function neighborhoodMapViewModel() {
 	self.list = document.getElementById('list');
 	var input = document.getElementById('pac-input');
 	var mapDiv = document.getElementById('map-canvas');
-	var mapOptions = {
-		zoom: 16, maxZoom: 16, minZoom: 10,
-		center: kapahulu,
-		disableDefaultUI: true,
-		zoomControl: true,
-		zoomControlOptions: {
-			style: google.maps.ZoomControlStyle.LARGE,
-			position: google.maps.ControlPosition.LEFT_TOP
-		},
-		scaleControl: true,
-		streetViewControl: true,
-		streetViewControlOptions: {
-			position: google.maps.ControlPosition.LEFT_TOP
-		}
-	};
 
 	function initialize() {
+		// Kapahulu area's latitude and longitude
+		var latitude = 21.2790587;
+		var longitude = -157.81368810000004;
+		kapahulu = new google.maps.LatLng(latitude, longitude);
+		var mapOptions = {
+			zoom: 16, maxZoom: 18, minZoom: 10,
+			center: kapahulu,
+			disableDefaultUI: true, zoomControl: true,
+			zoomControlOptions: {
+				style: google.maps.ZoomControlStyle.LARGE,
+				position: google.maps.ControlPosition.RIGHT_TOP
+			},
+			scaleControl: true, streetViewControl: true,
+			streetViewControlOptions: {
+				position: google.maps.ControlPosition.RIGHT_TOP
+			}
+		};
 		map = new google.maps.Map(mapDiv, mapOptions);
 		getGooglePlaces();
 		// Create the DIV to hold the control and call the CenterControl() constructor
-		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(self.list);
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+		map.controls[google.maps.ControlPosition.LEFT_TOP].push(self.list);
 
 		var centerControlDiv = document.createElement('div');
 		var centerControl = new CenterControl(centerControlDiv, map);
 		centerControlDiv.index = 1;
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(centerControlDiv);
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
 		// Handles an event where Google Maps takes too long to load
 		var timer = window.setTimeout(failedToLoad, 8000);
@@ -134,7 +133,7 @@ function neighborhoodMapViewModel() {
 	}
 	// Posts a message to let user know when Google Maps fails to load.
 	function failedToLoad() {
-		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please try reloading the page.</h1>");
+		$('#map-canvas').html("<h1>Google Maps Failed to Load. Please make sure you have Internet connection and try reloading the page.</h1>");
 	}
 	/**
 	*  This interfaces to bound pin markers in view helping the Pin model to show or hide pins
@@ -150,32 +149,31 @@ function neighborhoodMapViewModel() {
 	});
 	/**
 	*Loads the map as well as position the search bar and list, populates more markers.
-	* Zoom level 0-19; 0 for a planetary view and 19 to a very local view
 	* The function populates the map with markers with the helper data of
 	* from googleplaces array
 	*/
 	function getGooglePlaces() {
-		googleinfowin = new google.maps.InfoWindow();
-		var bounds = window.mapBounds;
+		googleinfowin = new google.maps.InfoWindow({maxWidth:150});
+		var bounds = new google.maps.LatLngBounds();
 		var len = googleplaces.length;
 		for(var i = 0; i < len; i++){
 			var lat = googleplaces[i][0];
 			var lon = googleplaces[i][1];
 			var fsid = googleplaces[i][3];
 			var gname = googleplaces[i][2];
-			var pin = new Pin(map, gname, lat, lon, fsid);
+			var pos = new google.maps.LatLng(lat,lon);
+			var pin = new Pin(map, gname, lat, lon, fsid, pos);
 			getFoursquareDetail(fsid);
-			bounds.extend(new google.maps.LatLng(latitude,longitude));
+			bounds.extend(pos);
 			self.pins.push(pin);
-		}
 		map.fitBounds(bounds);
 		map.setCenter(bounds.getCenter());
+		}
 	}
 	/**
 	* The async request to Foursquare: http://api.foursquare.com/v2/venues/VENUE_ID.
 	* This is invoked as the map is being populated with pins.
 	* Callback method is being used to assist with asynchronous fetch of data.
-	* John at Udacity helped me with the syntax to make the callback work.
 	* This venues/VENUE_ID requires the Foursquare ID as part of its URL. The other
 	* parameters namely, v, m, and format are required for versioning and format return
 	*/
@@ -187,8 +185,7 @@ function neighborhoodMapViewModel() {
 				console.log('oops');
 		});
 	}
-	// This callback pushes data to the foursquareData array which will be used at
-	// on-click demand of Foursquare data
+	// This callback pushes data to the foursquareData array
 	function callbackFn(data,fsid) {
 		var d = data.response.venue;
 		foursquareData.push([fsid, d.contact.formattedPhone || " ", d.location.formattedAddress[0] || " ", d.location.formattedAddress[1] || " ", d.rating || " ", d.url || " "]);
@@ -217,11 +214,21 @@ function neighborhoodMapViewModel() {
 		map.panTo(pos);
 		prepareInfowin(place.googlename(),place.marker(),fsdata);
 	};
-	// The initialize function is invoked upon launching this application
-	google.maps.event.addDomListener(window, 'load', initialize);
-	window.mapBounds = new google.maps.LatLngBounds();
-	window.addEventListener('resize', function(e) {
-		map.fitBounds(mapBounds);
+	// The initialize function is invoked upon launching this application but there's
+	// an initial check to make sure google.maps object exists otherwise provide error message
+	if (typeof google === 'object' && typeof google.maps === 'object') {
+			// Google maps loaded
+				google.maps.event.addDomListener(window, 'load', initialize);
+	} else {
+		failedToLoad();
+	}
+
+	google.maps.event.addDomListener(window, 'resize', function() {
+		// upon resizing browser infowindow is "minimized" to just the venue name
+		if (googleinfowin) googleinfowin.setContent('<strong>'+googname+'</strong><hr>click again for 4square');
+		var center = map.getCenter();
+		google.maps.event.trigger(map, "resize");
+		map.setCenter(center);
 	});
 }
 

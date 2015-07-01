@@ -47,25 +47,23 @@ hr {
 	padding: 0;
 }
 #map-canvas {
-	position:fixed;
 	height: 100%;
 	width: 100%;
-//	height:calc(100% - 0px);
 }
 
 .googleinfowindow {
-// to be prepared if styling of Infowindow will be required
+	font-size: 1em;
 }
 
 .reset-button {
 	background-color: $yellow;
-border: 2px solid #fff;
-border-radius: 3px;
-box-shadow: 0 2px .375em rgba(0,0,0,.3);
-cursor: pointer;
-margin-bottom: 1.375em;
-margin-left: .375em;
-text-align: center;
+	border: 2px solid #fff;
+	border-radius: 3px;
+	box-shadow: 0 2px .375em $black_30;
+	cursor: pointer;
+	margin-bottom: 1.375em;
+	margin-left: .375em;
+	text-align: center;
 }
 
 .reset-button-text {
@@ -86,33 +84,19 @@ text-align: center;
 	box-shadow: 0 2px .375em $black_30;
 }
 
-@media screen and(min-width: 500px) {
 #list {
 	background-color: $bluish_white;
 	font-size: 1.25em;
 	font-weight: 300;
-	margin-left: .75em;
+	margin-left: 1.125em;
 	padding: 0;
 	overflow: scroll;
 	width: 30%;
-	height: 93%;
+	height: 83%;
 	top: 1em;
 	opacity: .9;
 }
-}
 
-@media screen and(max-width: 499px) {
-#list { display: none; }
-}
-
-@media screen and(max-width: 400px) {
-	#pac-input {
-		width: 90%;
-		&:focus {
-			width: 91%;
-		}
-	}
-}
 #pac-input {
 	background-color: $white;
 	font-size: 1.25em;
@@ -120,23 +104,12 @@ text-align: center;
 	margin-left: 1.125em;
 	padding: 0 .688em 0 .813em;
 	text-overflow: ellipsis;
-	width: 40%;
+	width: 30%;
 	&:focus {
 		border-color: $color_cornflower_blue_approx;
-		padding-left: .875em;
-		width: 41%;
 	}
 }
 
-#type-selector {
-	color: $white;
-	background-color: $color_cornflower_blue_approx;
-	padding: 5px .688em 0;
-	label {
-		font-size: .813em;
-		font-weight: 300;
-	}
-}
 p.name {
 	font-size: .875em;
 	font-weight: bold;
